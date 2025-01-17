@@ -5,7 +5,7 @@ class Board:
     DIM = 4
     def __init__(self):
         
-        self.tiles = [[None] * self.DIM for i in range(self.DIM)]
+        self.tiles = [[None] * self.DIM for _ in range(self.DIM)]
         
         # generate random positions for first two tiles
         r1 = random.randint(0,self.DIM-1)
