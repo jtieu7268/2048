@@ -1,5 +1,17 @@
 class Tile:
-    # values = 
+    """ a class representing a tile on 2048 board
+
+    attributes
+    ----------
+    val : int
+        the value of the tile
+
+    methods
+    -------
+    change_loc(r,c)
+        changes the location of the tile on the board to r,c
+
+    """
 
     def __init__(self,val):
         self.val = val
