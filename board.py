@@ -20,8 +20,6 @@ class Board:
         generates a new tile with a start value at an open location on the board
     move(dir: str)
         modifies board tiles according to direction dir
-    array_rep()
-        returns array representing board tiles
     """
 
     DIM = 4
@@ -79,34 +77,28 @@ class Board:
             # check each column
             for c, col in enumerate(zip(*self.tiles)):
                 empty_queue = []
-                prev_tile_pos = 0
+                prev_tile_pos = -1
                 for r, tile in enumerate(col):
+                    # empty tile
                     if not tile:
                         empty_queue.append(r)
-                    elif not prev_tile_pos:
-                        if empty_queue:
-                            new_r = empty_queue[0]
-                            empty_queue.remove(new_r)
-                            self.tiles[new_r][c] = tile
+                    # tile exists
+                    else:
+                        # merge
+                        if prev_tile_pos != -1 and self.tiles[prev_tile_pos][c] == tile:
+                            self.tiles[prev_tile_pos][c] *= 2
                             self.tiles[r][c] = 0
                             empty_queue.append(r)
-                            prev_tile_pos = new_r
-                        else:    
-                            prev_tile_pos = r
-                    elif tile != self.tiles[prev_tile_pos][c]:
+                            prev_tile_pos = -1
+                        else:
+                            # move tile to furthest empty space
                             if empty_queue:
-                                new_r = empty_queue[0]
-                                empty_queue.remove(new_r)
+                                new_r = empty_queue.pop(0)
                                 self.tiles[new_r][c] = tile
-                                self.tiles[r][c] = None
+                                self.tiles[r][c] = 0
                                 empty_queue.append(r)
-                                prev_tile_pos = new_r
-                            else:
-                                prev_tile_pos = r
-                    else:
-                        self.tiles[prev_tile_pos][c] *= 2
-                        self.tiles[r][c] = 0
-                        empty_queue.append(r)
+                            # tile does not move because not further empty spaces and no merging possible
+                            prev_tile_pos = r
 
     def __str__(self) -> str:
         print_str = "\n+---+---+---+---+"
