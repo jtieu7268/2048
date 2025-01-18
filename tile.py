@@ -8,16 +8,26 @@ class Tile:
 
     methods
     -------
-    change_loc(r,c)
+    get_val()
+        returns value of the tile
+    set_val(new val: int)
+        changes value of the tile to new_val
+    change_loc(r: int,c: int)
         changes the location of the tile on the board to r,c
 
     """
 
-    def __init__(self,val):
+    def __init__(self,val: int):
         self.val = val
         #self.loc = loc
     
-    def change_loc(self,r,c):
+    def get_val(self):
+        return self.val
+    
+    def set_val(self,val: int):
+        self.val = val
+    
+    def change_loc(self,r: int,c: int):
         self.loc = (r,c)
 
     def __str__(self):

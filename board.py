@@ -1,4 +1,3 @@
-from tile import Tile
 import random
 
 class Board:
@@ -19,6 +18,10 @@ class Board:
     -------
     new_tile()
         generates a new tile with a start value at an open location on the board
+    move(dir: str)
+        modifies board tiles according to direction dir
+    array_rep()
+        returns array representing board tiles
     """
 
     DIM = 4
@@ -27,18 +30,16 @@ class Board:
 
     def __init__(self):
         
-        self.tiles = [[None] * self.DIM for _ in range(self.DIM)]
+        self.tiles = [[0] * self.DIM for _ in range(self.DIM)]
         
         # generate first two tiles
         self.new_tile()
         self.new_tile()
 
-    def new_tile(self) -> Tile:
+    def new_tile(self):
         """generates a new tile with a start value at an open location on the board
 
-        returns
-        -------
-            Tile : the new tile
+            directly modifies board tiles
         """
 
         # function to generate start value
@@ -53,10 +54,60 @@ class Board:
             r = random.randint(0,self.DIM-1)
             c = random.randint(0,self.DIM-1)
         
-        self.tiles[r][c] = Tile(new_value())
-        
-        return self.tiles[r][c]
+        self.tiles[r][c] = new_value()
     
+    def move(self,dir):
+        """modifies board tiles according to direction dir
+
+        tiles slide in chosen direction based on the following:
+	        1. tiles slide until stopped by edge of board
+	        2. if two tiles of the same number collide, they merge to form a tile with the value of their sum
+	        3. if three tiles with the same value collide, only the two farthest into the chosen direction merge
+	        4. if four tiles with the same value collide, the first two and the last two merge
+
+        parameters
+        ----------
+        dir : str
+            the direction to move tiles
+            "W": UP
+            "D": RIGHT
+            "S": DOWN
+            "A": LEFT
+        """
+
+        if dir == "W":
+            # check each column
+            for c, col in enumerate(zip(*self.tiles)):
+                empty_queue = []
+                prev_tile_pos = 0
+                for r, tile in enumerate(col):
+                    if not tile:
+                        empty_queue.append(r)
+                    elif not prev_tile_pos:
+                        if empty_queue:
+                            new_r = empty_queue[0]
+                            empty_queue.remove(new_r)
+                            self.tiles[new_r][c] = tile
+                            self.tiles[r][c] = 0
+                            empty_queue.append(r)
+                            prev_tile_pos = new_r
+                        else:    
+                            prev_tile_pos = r
+                    elif tile != self.tiles[prev_tile_pos][c]:
+                            if empty_queue:
+                                new_r = empty_queue[0]
+                                empty_queue.remove(new_r)
+                                self.tiles[new_r][c] = tile
+                                self.tiles[r][c] = None
+                                empty_queue.append(r)
+                                prev_tile_pos = new_r
+                            else:
+                                prev_tile_pos = r
+                    else:
+                        self.tiles[prev_tile_pos][c] *= 2
+                        self.tiles[r][c] = 0
+                        empty_queue.append(r)
+
     def __str__(self) -> str:
         print_str = "\n+---+---+---+---+"
         for row in self.tiles:

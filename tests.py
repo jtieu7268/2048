@@ -1,5 +1,6 @@
 import unittest
 from board import Board
+from tile import Tile
 
 class test_board(unittest.TestCase):
     def test_board_constructor(self):
@@ -7,8 +8,42 @@ class test_board(unittest.TestCase):
 
         self.assertEqual(len(bd.tiles),bd.DIM,f'number of rows is {len(bd.tiles)} instead of {bd.DIM}')
         self.assertEqual(len(bd.tiles[0]),bd.DIM,f'number of cols is {len(bd.tiles[0])} instead of {bd.DIM}')
-        num_init_tiles = sum(sum(r) for r in [[1 if t != None else 0 for t in row] for row in bd.tiles])
+        num_init_tiles = sum(sum(r) for r in [[1 if t != 0 else 0 for t in row] for row in bd.tiles])
         self.assertEqual(num_init_tiles,2,f'number of initialized tiles is {num_init_tiles} instead of 2')
+
+    def test_move_up_c0_2000(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][0] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c0_0020(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[2][0] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c1_0004(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[3][1] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_array_rep(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][0] = 2
+        self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+
+def reset_board(bd: Board):
+    for r,row in enumerate(bd.tiles):
+        for c,tile in enumerate(row):
+            if tile:
+                bd.tiles[r][c] = 0
 
 if __name__ == "__main__":
     unittest.main()
