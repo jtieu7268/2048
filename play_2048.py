@@ -10,6 +10,8 @@ def main():
         while dir not in ["W","D","S","A"]:
             dir = input('enter valid move').upper() # TODO: clearer message
         bd.move(dir)
+        # TODO: valid move checker, move is not valid if it doesn't more any tiles
+        bd.new_tile()
         print(bd)
 
 def instructions():

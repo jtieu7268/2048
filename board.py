@@ -73,7 +73,7 @@ class Board:
             "S": DOWN
             "A": LEFT
         """
-        
+
         is_horizontal = dir == "A" or dir == "D"
         tiles = self.tiles if is_horizontal else zip(*self.tiles)
         # check each vector in direction of dir
@@ -121,6 +121,7 @@ class Board:
         NUM_SPACES = 7
         print_str = "\n+-------+-------+-------+-------+"
         for row in self.tiles:
+            print_str += "\n|       |       |       |       |"
             print_str += "\n|"
             for tile in row:
                 if not tile:
@@ -132,6 +133,7 @@ class Board:
                     print_str += str(tile)
                     print_str += (" " * (NUM_SPACES - num_dig - num_st_sp))
                 print_str += "|"
+            print_str += "\n|       |       |       |       |"
             print_str += "\n+-------+-------+-------+-------+"
         print_str += "\n"
         return print_str
