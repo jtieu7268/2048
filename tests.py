@@ -135,6 +135,16 @@ class test_board(unittest.TestCase):
         bd.move("W")
         self.assertEqual(bd.tiles,[[0,0,8,0],[0,0,8,0],[0,0,0,0],[0,0,0,0]])
 
+    def test_move_up_c2_8844_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][2] = 8
+        bd.tiles[1][2] = 8
+        bd.tiles[2][2] = 4
+        bd.tiles[3][2] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,16,0],[0,0,8,0],[0,0,0,0],[0,0,0,0]])
+
 
 def reset_board(bd: Board):
     for r,row in enumerate(bd.tiles):

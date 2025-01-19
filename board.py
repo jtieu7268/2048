@@ -1,4 +1,5 @@
 import random
+import math
 
 class Board:
     """ a class representing board for playing 2048
@@ -103,12 +104,21 @@ class Board:
                                 prev_tile_pos = r
 
     def __str__(self) -> str:
-        print_str = "\n+---+---+---+---+"
+        NUM_SPACES = 7
+        print_str = "\n+-------+-------+-------+-------+"
         for row in self.tiles:
-            print_str += "\n| "
-            print_str += " | ".join([str(tile) if tile else " " for tile in row])
-            print_str += " |"
-            print_str += "\n+---+---+---+---+"
+            print_str += "\n|"
+            for tile in row:
+                if not tile:
+                    print_str += (" " * NUM_SPACES)
+                else:
+                    num_dig = math.floor(math.log10(tile)) + 1
+                    num_st_sp = (NUM_SPACES - num_dig) // 2
+                    print_str += (" " * num_st_sp)
+                    print_str += str(tile)
+                    print_str += (" " * (NUM_SPACES - num_dig - num_st_sp))
+                print_str += "|"
+            print_str += "\n+-------+-------+-------+-------+"
         print_str += "\n"
         return print_str
             
