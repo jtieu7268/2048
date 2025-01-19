@@ -73,35 +73,49 @@ class Board:
             "S": DOWN
             "A": LEFT
         """
-
-        if dir == "W":
-            # check each column
-            for c, col in enumerate(zip(*self.tiles)):
-                empty_queue = []
-                prev_tile_pos = -1
-                for r, tile in enumerate(col):
-                    # empty tile
-                    if not tile:
-                        empty_queue.append(r)
-                    # tile exists
-                    else:
-                        # merge
-                        if prev_tile_pos != -1 and self.tiles[prev_tile_pos][c] == tile:
-                            self.tiles[prev_tile_pos][c] *= 2
-                            self.tiles[r][c] = 0
-                            empty_queue.append(r)
-                            prev_tile_pos = -1
+        
+        is_horizontal = dir == "A" or dir == "D"
+        tiles = self.tiles if is_horizontal else zip(*self.tiles)
+        # check each vector in direction of dir
+        for i, dir_vector in enumerate(tiles):
+            empty_queue = []
+            prev_tile_pos = -1
+            is_UL = dir == "A" or dir == "W"
+            ordered_dir_vector = dir_vector if is_UL else dir_vector[::-1]
+            for j, tile in enumerate(ordered_dir_vector):
+                j_actual = j if is_UL else self.DIM-j-1
+                # empty tile
+                if not tile:
+                    empty_queue.append(j_actual)
+                # tile exists
+                else:
+                    # merge
+                    is_horizontal_merge = is_horizontal and self.tiles[i][prev_tile_pos] == tile
+                    is_vertical_merge = not is_horizontal and self.tiles[prev_tile_pos][i] == tile
+                    if prev_tile_pos != -1 and (is_horizontal_merge or is_vertical_merge):
+                        if is_horizontal_merge:
+                            self.tiles[i][prev_tile_pos] *= 2
+                            self.tiles[i][j_actual] = 0
                         else:
-                            # move tile to furthest empty space
-                            if empty_queue:
-                                new_r = empty_queue.pop(0)
-                                self.tiles[new_r][c] = tile
-                                self.tiles[r][c] = 0
-                                empty_queue.append(r)
-                                prev_tile_pos = new_r
-                            # tile does not move because not further empty spaces and no merging possible
+                            self.tiles[prev_tile_pos][i] *= 2
+                            self.tiles[j_actual][i] = 0
+                        empty_queue.append(j_actual)
+                        prev_tile_pos = -1
+                    else:
+                        # move tile to furthest empty space
+                        if empty_queue:
+                            new_j = empty_queue.pop(0)
+                            if is_horizontal:
+                                self.tiles[i][new_j] = tile
+                                self.tiles[i][j_actual] = 0
                             else:
-                                prev_tile_pos = r
+                                self.tiles[new_j][i] = tile
+                                self.tiles[j_actual][i] = 0
+                            empty_queue.append(j_actual)
+                            prev_tile_pos = new_j
+                        # tile does not move because not further empty spaces and no merging possible
+                        else:
+                            prev_tile_pos = j_actual
 
     def __str__(self) -> str:
         NUM_SPACES = 7
