@@ -113,7 +113,7 @@ class Board:
                                 self.tiles[j_actual][i] = 0
                             empty_queue.append(j_actual)
                             prev_tile_pos = new_j
-                        # tile does not move because not further empty spaces and no merging possible
+                        # tile does not move because no further empty spaces and no merging possible
                         else:
                             prev_tile_pos = j_actual
 
