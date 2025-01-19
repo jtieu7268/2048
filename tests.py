@@ -32,11 +32,108 @@ class test_board(unittest.TestCase):
         bd.move("W")
         self.assertEqual(bd.tiles,[[0,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
-    def test_array_rep(self):
+    def test_move_up_c0_0240(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][0] = 2
+        bd.tiles[2][0] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c0_0204(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][0] = 2
+        bd.tiles[3][0] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
+    
+    def test_move_up_c0_2004(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[0][0] = 2
-        self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+        bd.tiles[3][0] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
+   
+    def test_move_up_c0_0220_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][0] = 2
+        bd.tiles[2][0] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+    
+    def test_move_up_c0_0202_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][0] = 2
+        bd.tiles[3][0] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c0_0404_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][0] = 4
+        bd.tiles[3][0] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[8,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c3_0404_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][3] = 4
+        bd.tiles[3][3] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,0,8],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c2_2420(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][2] = 2
+        bd.tiles[1][2] = 4
+        bd.tiles[2][2] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,2,0],[0,0,4,0],[0,0,2,0],[0,0,0,0]])
+
+    def test_move_up_c2_2220_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][2] = 2
+        bd.tiles[1][2] = 2
+        bd.tiles[2][2] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,2,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c2_2220_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[1][2] = 2
+        bd.tiles[2][2] = 2
+        bd.tiles[3][2] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,2,0],[0,0,0,0],[0,0,0,0]])
+
+    def test_move_up_c2_2222_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][2] = 2
+        bd.tiles[1][2] = 2
+        bd.tiles[2][2] = 2
+        bd.tiles[3][2] = 2
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,4,0],[0,0,0,0],[0,0,0,0]])
+    
+    def test_move_up_c2_4444_merge(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles[0][2] = 4
+        bd.tiles[1][2] = 4
+        bd.tiles[2][2] = 4
+        bd.tiles[3][2] = 4
+        bd.move("W")
+        self.assertEqual(bd.tiles,[[0,0,8,0],[0,0,8,0],[0,0,0,0],[0,0,0,0]])
 
 
 def reset_board(bd: Board):

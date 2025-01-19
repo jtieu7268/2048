@@ -97,8 +97,10 @@ class Board:
                                 self.tiles[new_r][c] = tile
                                 self.tiles[r][c] = 0
                                 empty_queue.append(r)
+                                prev_tile_pos = new_r
                             # tile does not move because not further empty spaces and no merging possible
-                            prev_tile_pos = r
+                            else:
+                                prev_tile_pos = r
 
     def __str__(self) -> str:
         print_str = "\n+---+---+---+---+"
