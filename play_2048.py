@@ -54,9 +54,7 @@ def game_over(bd: Board):
     """
 
     def is_in_board(val: int):
-        for row in bd.tiles:
-            if val in bd.tiles: return 1
-        return 0
+        return any(val in row for row in bd.tiles)
     
     def got_2048():
         return is_in_board(2048)
@@ -67,16 +65,18 @@ def game_over(bd: Board):
             return 0
         # board is filled, checks if there are possible merges
         else:
-            prev_val_pos = -1
-            for r,row in enumerate(bd.tiles):
-                for c,tile in enumerate(row):
-                    if prev_val_pos != -1 and tile == row[prev_val_pos]:
-                        return 0
-                    prev_val_pos = c
+            for orientation in [bd.tiles,zip(*bd.tiles)]:
+                for vector in orientation:
+                    prev_val_pos = -1
+                    for i,tile in enumerate(vector):
+                        if prev_val_pos != -1 and tile == vector[prev_val_pos]:
+                            return 0
+                        prev_val_pos = i
             return 1
                         
     if got_2048(): return 1
     if no_legal_moves(): return 2
     return 0
 
-main()
+if __name__ == "__main__":
+    main()

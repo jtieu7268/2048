@@ -1,5 +1,6 @@
 import unittest
 from board import Board
+import play_2048
 
 class test_board_init(unittest.TestCase):
 
@@ -364,6 +365,14 @@ class test_board_move(unittest.TestCase):
         bd.tiles[3][2] = 4
         bd.move("S")
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,8,0],[0,0,8,0]])
+
+class test_game_over(unittest.TestCase):
+    
+    def test_not_game_over_board_full(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
+        self.assertEqual(play_2048.game_over(bd),0)
 
 def reset_board(bd: Board):
     for r,row in enumerate(bd.tiles):
