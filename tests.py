@@ -587,9 +587,9 @@ class test_game_loop(unittest.TestCase):
         bd.tiles[0][0] = 1024
         bd.tiles[1][0] = 1024
         # move up then quit
-        play_2048.game_loop(bd)
+        play_2048.game_loop()
 
-def reset_board(bd: Board):
+def reset_board(bd):
     bd.tiles = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 if __name__ == "__main__":

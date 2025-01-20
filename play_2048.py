@@ -2,19 +2,15 @@ from board import Board
 from os import system
 from time import sleep
 
-# TODO: optimizations: is_valid_move
-# TODO: board as row and col of linked lists
-
 def main():
-    bd = Board()
-    game_start(bd)
-    score = game_loop(bd)
+    game_start()
+    score = game_loop()
     game_end(score)
 
 def clear_screen():
     system('clear')
 
-def game_start(bd: Board):
+def game_start():
     """introduces game through print statements
 
     welcomes player into game
@@ -26,13 +22,8 @@ def game_start(bd: Board):
     input("To start, press any key\n")
     clear_screen()
 
-def game_loop(bd: Board) -> int:
+def game_loop() -> int:
     """main game loop which iteratively requests command or move direction from player, moves tiles, and tracks score
-
-    parameters
-    ----------
-    bd : Board
-        the game board
 
     returns
     -------
@@ -40,6 +31,7 @@ def game_loop(bd: Board) -> int:
         represents the score of the game i.e. the sum of all merged tiles during the game
     """
 
+    bd = Board()
     score = 0
     status = game_over_status(bd)
     won = False
@@ -91,14 +83,20 @@ def is_valid_move(bd: Board, dir: str) -> bool:
     """
 
     if dir in ["W","D","S","A"]:
-        old_tiles = [[tile for tile in row] for row in bd.tiles]
-        bd.move(dir)
-        if bd.tiles == old_tiles:
-            print("Your move did not move any tiles. Please select another direction.")
-            return False
-        else:
-            bd.tiles = old_tiles
-            return True
+        is_horizontal = dir == "A" or dir == "D"
+        is_UL = dir == "A" or dir == "W"
+        tiles = bd.tiles if is_horizontal else zip(*bd.tiles)
+        for i, dir_vector in enumerate(tiles):
+            ordered_dir_vector = dir_vector if is_UL else dir_vector[::-1]
+            for j, tile in enumerate(ordered_dir_vector[:-1]):
+                # a tile would be moved
+                if tile == 0 and ordered_dir_vector[j+1] != 0:
+                    return True
+                # tiles would be merged
+                if tile != 0 and tile == ordered_dir_vector[j+1]:
+                    return True
+        print("Your move did not move any tiles. Please select another direction.")
+        return False
     else:
         print("That is not a valid option. Please refer to the options above.")
         return False

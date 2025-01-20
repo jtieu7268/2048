@@ -12,8 +12,6 @@ class Board:
         the dimension of each side of the board
     START_VALS : list
         a list of possible values for new tiles on the board
-    START_VALS_WEIGHTS : list
-        a list of the weights representing the likelihood of generating the respective START_VALS
 
     methods
     -------
@@ -24,8 +22,7 @@ class Board:
     """
 
     DIM = 4
-    START_VALS = [2,4]
-    START_VALS_WEIGHTS = [0.9,0.1]
+    START_VALS = [2,2,2,2,2,2,2,2,2,4]
 
     def __init__(self):
         
@@ -43,7 +40,7 @@ class Board:
 
         # function to generate start value
         def new_value():
-            return random.choices(self.START_VALS,self.START_VALS_WEIGHTS)[0]
+            return random.choices(self.START_VALS)[0]
         
         # generate random position
         r = random.randint(0,self.DIM-1)
@@ -80,12 +77,12 @@ class Board:
         """
         score = 0
         is_horizontal = dir == "A" or dir == "D"
+        is_UL = dir == "A" or dir == "W"
         tiles = self.tiles if is_horizontal else zip(*self.tiles)
         # check each vector in direction of dir
         for i, dir_vector in enumerate(tiles):
             empty_queue = []
             prev_tile_pos = -1
-            is_UL = dir == "A" or dir == "W"
             ordered_dir_vector = dir_vector if is_UL else dir_vector[::-1]
             for j, tile in enumerate(ordered_dir_vector):
                 j_actual = j if is_UL else self.DIM-j-1
