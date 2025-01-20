@@ -35,7 +35,7 @@ class Board:
     move(dir: str) -> int
         modifies board tiles according to direction dir, returns score from move
     is_end()
-        # TODO: implement and decide if want to separate
+        returns status of the board tiles, 0 if not the end, 1 if game is won, 2 if no legal moves left and game is over
     """
 
     DIM = 4
@@ -222,9 +222,9 @@ class Board:
         return score
 
     def is_end(self, won: bool=False) -> int:
-        """returns status of the game board
+        """returns status of the board tiles
 
-        if board is playable, returns 0 (game is not over) or returns 1 if board contains WIN_VAL
+        if board is playable, returns 0 (game is not over) or returns 1 if board tiles contains WIN_VAL
         if game is over, returns 2 (there are no legal moves)
         paramaters
         ----------

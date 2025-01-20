@@ -544,14 +544,26 @@ class test_game_over_status(unittest.TestCase):
         bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
         self.assertEqual(play_2048.game_over_status(bd),1)
 
-class test_game_loop(unittest.TestCase):
+class test_board_is_end(unittest.TestCase):
 
-    def test_game_loop_win(self):
+    def test_board_is_end_win(self):
         bd = Board()
         bd.tiles[0][0] = 1024
         bd.tiles[1][0] = 1024
-        # move up then quit
-        # play_2048.game_loop()
+        self.assertFalse(bd.is_end())
+        bd.move("U")
+        self.assertEqual(bd.is_end(),1)
+
+    def test_board_is_end_loss(self):
+        bd = Board()
+        bd.tiles = [[128,256,64,16],[16,2,128,64],[2,4,8,16],[32,64,128,64]]
+        self.assertEqual(bd.is_end(),2)
+
+    def test_board_is_end_win_diff_win_val(self):
+        bd = Board(win_val=512)
+        bd.tiles = [[512,64,4,2],[128,64,2,0],[64,0,0,0],[0,0,0,0]]
+        self.assertEqual(bd.is_end(),1)
+
 
 def reset_board(bd):
     bd.tiles = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
