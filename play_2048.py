@@ -2,6 +2,8 @@ from board import Board
 from os import system
 from time import sleep
 
+move_key = {"W":"U","D":"R","S":"D","A":"L"}
+
 def main():
     game_start()
     score = game_loop()
@@ -57,7 +59,7 @@ def game_loop() -> int:
             print("Here is a new board")
             continue
         clear_screen()
-        score += bd.move(dir)
+        score += bd.move(move_key[dir])
         bd.new_tile()
         status = game_over_status(bd,won)
     if score > high_score: high_score = score

@@ -1,4 +1,5 @@
 from random import choice
+from collections import deque
 import math
 
 def transpose(tiles: list) -> list:
@@ -46,7 +47,9 @@ class Board:
     START_VALS : list
         a list of possible values for new tiles on the board
     WIN_VAL : int
-        the value of the tile to form to win    
+        the value of the tile to form to win
+    MOVES : str
+        valid moves: U: UP, R: RIGHT, D: DOWN, L: LEFT
     
     methods
     -------
@@ -60,6 +63,7 @@ class Board:
 
     DIM = 4
     START_VALS = [2] * 9 + [4] # 90% prob of 2, 10% prob of 1
+    MOVES = 'URDL'
 
     def __init__(self, win_val: int = 2048):
         
@@ -83,7 +87,7 @@ class Board:
         self.tiles[r][c] = choice(self.START_VALS)
     
     def move(self,dir: str) -> int:
-        """modifies board tiles according to direction dir
+        """modifies board tiles according to direction dir, generates new tile if possible
 
         tiles slide in chosen direction based on the following:
 	        1. tiles slide until stopped by edge of board
@@ -94,62 +98,74 @@ class Board:
         parameters
         ----------
         dir : str
-            the direction to move tiles
-            "W": UP
-            "D": RIGHT
-            "S": DOWN
-            "A": LEFT
+            the direction to move tiles, dir is in MOVES
+            "U": UP
+            "R": RIGHT
+            "D": DOWN
+            "L": LEFT
 
         returns
         -------
         int
             the sum of all the merged tiles resulting from moving tiles in direction dir
+            -1 if move is not valid
         """
+        
+        # helper to check that move is valid, i.e., moving tiles yields a change in the board tiles
+        # takes board tiles that have been transposed and reversed according to direction of move
+        def is_valid_move(tiles: list) -> bool:
+            for i, vector in enumerate(tiles):
+                for j, tile in enumerate(vector[:-1]):
+                    # tile would be moved
+                    if tile == 0 and vector[j+1] != 0:
+                        return True
+                    if tile != 0 and vector[j+1] == tile:
+                        return True
+            return False
+
+        tiles = self.tiles
+        if dir == "U" or dir == "D":
+            tiles = transpose(tiles)
+        if dir == "R" or dir == "D":
+            tiles = reverse(tiles)
+        
+        if not is_valid_move(tiles): return -1
+
         score = 0
-        is_horizontal = dir == "A" or dir == "D"
-        is_UL = dir == "A" or dir == "W"
-        tiles = self.tiles if is_horizontal else zip(*self.tiles)
-        # check each vector in direction of dir
-        for i, dir_vector in enumerate(tiles):
-            empty_queue = []
+    
+        for i, vector in enumerate(tiles):
+            empty_queue = deque()
             prev_tile_pos = -1
-            ordered_dir_vector = dir_vector if is_UL else dir_vector[::-1]
-            for j, tile in enumerate(ordered_dir_vector):
-                j_actual = j if is_UL else self.DIM-j-1
+            for j, tile in enumerate(vector):
                 # empty tile
                 if not tile:
-                    empty_queue.append(j_actual)
+                    empty_queue.append(j)
                 # tile exists
                 else:
                     # merge
-                    is_horizontal_merge = is_horizontal and self.tiles[i][prev_tile_pos] == tile
-                    is_vertical_merge = not is_horizontal and self.tiles[prev_tile_pos][i] == tile
-                    if prev_tile_pos != -1 and (is_horizontal_merge or is_vertical_merge):
-                        if is_horizontal_merge:
-                            self.tiles[i][prev_tile_pos] *= 2
-                            score += self.tiles[i][prev_tile_pos]
-                            self.tiles[i][j_actual] = 0
-                        else:
-                            self.tiles[prev_tile_pos][i] *= 2
-                            score += self.tiles[prev_tile_pos][i]
-                            self.tiles[j_actual][i] = 0
-                        empty_queue.append(j_actual)
+                    if prev_tile_pos != -1 and tiles[i][prev_tile_pos] == tile:
+                        tiles[i][prev_tile_pos] *= 2
+                        score += tiles[i][prev_tile_pos]
+                        tiles[i][j] = 0
+                        empty_queue.append(j)
                         prev_tile_pos = -1
+                    # move tile to furthest empty space to the left
                     else:
-                        # move tile to furthest empty space
                         if empty_queue:
-                            new_j = empty_queue.pop(0)
-                            if is_horizontal:
-                                self.tiles[i][new_j] = tile
-                                self.tiles[i][j_actual] = 0
-                            else:
-                                self.tiles[new_j][i] = tile
-                                self.tiles[j_actual][i] = 0
-                            empty_queue.append(j_actual)
+                            new_j = empty_queue.popleft()
+                            tiles[i][new_j] = tile
+                            tiles[i][j] = 0
+                            empty_queue.append(j)
                             prev_tile_pos = new_j
-                        # tile does not move because no further empty spaces and no merging possible
                         else:
-                            prev_tile_pos = j_actual
+                            prev_tile_pos = j
+        
+        if dir == "R" or dir == "D":
+            tiles = reverse(tiles)
+        if dir == "U" or dir == "D":
+            tiles = transpose(tiles)
+        self.tiles = tiles
+
         return score
 
     def __str__(self) -> str:
