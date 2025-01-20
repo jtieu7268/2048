@@ -73,46 +73,6 @@ def game_loop() -> int:
     if score > high_score: high_score = score
     return high_score
 
-def is_valid_move(bd: Board, dir: str) -> bool:
-    """returns whether move dir is valid
-        
-    move is valid if it corresponds to a letter in ["W","D","S","A"] and if it changes the board tiles
-
-    prints a message to clarify how to make move valid
-    
-    parameters
-    ----------
-    bd : Board
-        the game board
-    dir : str
-        the input from player
-
-    returns
-    -------
-    bool
-        True if dir is a valid move, else False
-
-    """
-
-    if dir in ["W","D","S","A"]:
-        is_horizontal = dir == "A" or dir == "D"
-        is_UL = dir == "A" or dir == "W"
-        tiles = bd.tiles if is_horizontal else zip(*bd.tiles)
-        for i, dir_vector in enumerate(tiles):
-            ordered_dir_vector = dir_vector if is_UL else dir_vector[::-1]
-            for j, tile in enumerate(ordered_dir_vector[:-1]):
-                # a tile would be moved
-                if tile == 0 and ordered_dir_vector[j+1] != 0:
-                    return True
-                # tiles would be merged
-                if tile != 0 and tile == ordered_dir_vector[j+1]:
-                    return True
-        print("Your move did not move any tiles. Please select another direction.")
-        return False
-    else:
-        print("That is not a valid option. Please refer to the options above.")
-        return False
-
 def game_over_status(bd: Board, won: bool=False) -> int:
     """returns status of the game board
 
