@@ -73,50 +73,6 @@ def game_loop() -> int:
     if score > high_score: high_score = score
     return high_score
 
-def game_over_status(bd: Board, won: bool=False) -> int:
-    """returns status of the game board
-
-    if board is playable, returns 0 (game is not over) or returns 1 if board contains 2048
-    if game is over, returns 2 (there are no legal moves)
-
-    paramaters
-    ----------
-    bd : Board
-        the current game board
-    won : bool
-        boolean indicating whether game has been won i.e. if 2048 tile has been created
-
-    returns
-    -------
-    int
-        the status of the game, 0 if game is not over, 1 if board contains 2048, 2 if there are no legal moves
-    """
-
-    def is_in_board(val: int):
-        return any(val in row for row in bd.tiles)
-    
-    def got_2048():
-        return is_in_board(2048)
-        
-    def no_legal_moves():
-        # checks if board is filled
-        if is_in_board(0): 
-            return 0
-        # board is filled, checks if there are possible merges
-        else:
-            for orientation in [bd.tiles,zip(*bd.tiles)]:
-                for vector in orientation:
-                    prev_val_pos = -1
-                    for i,tile in enumerate(vector):
-                        if prev_val_pos != -1 and tile == vector[prev_val_pos]:
-                            return 0
-                        prev_val_pos = i
-            return 1
-                        
-    if not won and got_2048(): return 1
-    if no_legal_moves(): return 2
-    return 0
-
 def game_end(score: int):
     """displays score of the game and bids adieu to player through print statements
 
