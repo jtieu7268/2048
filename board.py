@@ -100,9 +100,9 @@ class Board:
 
         tiles = self.tiles
         if dir == "U" or dir == "D":
-            tiles = self.transpose(tiles)
+            tiles = Board.transpose(tiles)
         if dir == "R" or dir == "D":
-            tiles = self.reverse(tiles)
+            tiles = Board.reverse(tiles)
         return tiles
 
     def unprocess_tiles(self, tiles: list, dir: str) -> list:
@@ -122,9 +122,9 @@ class Board:
         """
 
         if dir == "R" or dir == "D":
-            tiles = self.reverse(tiles)
+            tiles = Board.reverse(tiles)
         if dir == "U" or dir == "D":
-            tiles = self.transpose(tiles)
+            tiles = Board.transpose(tiles)
         return tiles
 
     def is_valid_move(self, dir: str) -> bool:
