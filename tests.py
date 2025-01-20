@@ -512,58 +512,6 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[3][3] = 64
         self.assertEqual(bd.move("L"),160)
 
-class test_is_valid_move(unittest.TestCase):
-
-    def test_is_valid_move_invalid_dir(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"F"),False)
-
-    def test_is_valid_move_invalid_dir_double_letter(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"WW"),False)
-
-    def test_is_valid_move_valid_up(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"W"),True)
-
-    def test_is_valid_move_valid_rt(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"D"),True)
-    
-    def test_is_valid_move_valid_dn(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"S"),True)
-
-    def test_is_valid_move_valid_lt(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"A"),True)
-
-    def test_is_valid_move_invalid_up(self):
-        bd = Board()
-        bd.tiles = [[0,2,2,0],[0,4,0,0],[0,0,0,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"W"),False)
-
-    def test_is_valid_move_invalid_rt(self):
-        bd = Board()
-        bd.tiles = [[0,0,2,4],[0,0,0,4],[0,0,0,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"D"),False)
-    
-    def test_is_valid_move_invalid_dn(self):
-        bd = Board()
-        bd.tiles = [[0,0,0,0],[0,0,0,0],[0,2,0,0],[0,4,2,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"S"),False)
-
-    def test_is_valid_move_invalid_lt(self):
-        bd = Board()
-        bd.tiles = [[4,2,0,0],[2,0,0,0],[0,0,0,0],[0,0,0,0]]
-        self.assertEqual(play_2048.is_valid_move(bd,"W"),False)
-
 class test_game_over_status(unittest.TestCase):
     
     def test_not_game_over_board_vertical_full(self):

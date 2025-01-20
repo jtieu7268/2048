@@ -33,7 +33,7 @@ class Board:
     new_tile()
         generates a new tile with a start value at an open location on the board
     move(dir: str) -> int
-        modifies board tiles according to direction dir, generates new tile if possible, returns score from move
+        modifies board tiles according to direction dir, returns score from move
     is_end()
         # TODO: implement and decide if want to separate
     """
@@ -164,7 +164,7 @@ class Board:
         self.tiles[r][c] = choice(self.START_VALS)
 
     def move(self,dir: str) -> int:
-        """modifies board tiles according to direction dir, generates new tile if possible
+        """modifies board tiles according to direction dir
 
         tiles slide in chosen direction based on the following:
 	        1. tiles slide until stopped by edge of board
@@ -218,8 +218,49 @@ class Board:
                             prev_tile_pos = j
         
         self.tiles = self.unprocess_tiles(tiles,dir)
-
+        
         return score
+
+    def is_end(self, won: bool=False) -> int:
+        """returns status of the game board
+
+        if board is playable, returns 0 (game is not over) or returns 1 if board contains WIN_VAL
+        if game is over, returns 2 (there are no legal moves)
+        paramaters
+        ----------
+        won : bool
+            boolean indicating whether game has been won i.e. if tile with WIN_VAL has been created
+        
+        returns
+        -------
+        int
+            the status of the game, 0 if game is not over, 1 if board contains WIN_VAL, 2 if there are no legal moves
+        """
+
+        def is_in_board(val: int):
+            return any(val in row for row in self.tiles)
+        
+        def got_win_val():
+            return is_in_board(self.WIN_VAL)
+            
+        def no_legal_moves():
+            # checks if board is filled
+            if is_in_board(0): 
+                return 0
+            # board is filled, checks if there are possible merges
+            else:
+                for orientation in [self.tiles,self.process_tiles("U")]:
+                    for vector in orientation:
+                        prev_val_pos = -1
+                        for i,tile in enumerate(vector):
+                            if prev_val_pos != -1 and tile == vector[prev_val_pos]:
+                                return 0
+                            prev_val_pos = i
+                return 1
+                            
+        if not won and got_win_val(): return 1
+        if no_legal_moves(): return 2
+        return 0
 
     def __str__(self) -> str:
         NUM_SPACES = 7

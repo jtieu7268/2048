@@ -39,7 +39,7 @@ def game_loop() -> int:
 
     bd = Board()
     high_score = score = 0
-    status = game_over_status(bd)
+    status = bd.is_end()
     won = False
     while status != 2:
         if status == 1:
@@ -69,7 +69,7 @@ def game_loop() -> int:
         clear_screen()
         score += bd.move(move_key[dir])
         bd.new_tile()
-        status = game_over_status(bd,won)
+        status = bd.is_end(won)
     if score > high_score: high_score = score
     return high_score
 
