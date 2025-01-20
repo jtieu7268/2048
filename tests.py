@@ -368,11 +368,35 @@ class test_board_move(unittest.TestCase):
 
 class test_game_over(unittest.TestCase):
     
-    def test_not_game_over_board_full(self):
+    def test_not_game_over_board_vertical_full(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
         self.assertEqual(play_2048.game_over(bd),0)
+    
+    def test_not_game_over_board_horizontal_full(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles = [[2,4,8,128],[8,8,64,1024],[4,16,128,256],[2,8,16,64]]
+        self.assertEqual(play_2048.game_over(bd),0)
+
+    def test_game_over_board_full(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles = [[2,4,8,128],[8,32,64,1024],[128,16,128,256],[2,8,16,64]]
+        self.assertEqual(play_2048.game_over(bd),2)
+
+    def test_not_game_over_board_not_full(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[0,8,16,64]]
+        self.assertEqual(play_2048.game_over(bd),0)
+
+    def test_game_over_2048(self):
+        bd = Board()
+        reset_board(bd)
+        bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
+        self.assertEqual(play_2048.game_over(bd),1)
 
 def reset_board(bd: Board):
     for r,row in enumerate(bd.tiles):

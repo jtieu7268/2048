@@ -2,26 +2,47 @@ from board import Board
 from os import system
 from time import sleep
 
+# TODO: game instructions
+# TODO: score
+# TODO: continue playing after 2048
+# TODO: polish main method
+# TODO: polishing look
+# TODO: end game screen
+# TODO: optimizations: is_valid_move
+# TODO: board as row and col of linked lists
+
 def main():
-    input('please press enter to play') # TODO: instructions
     bd = Board()
-    print(bd)
-
-    while not game_over(bd):
-        dir = input('enter your move:\n').upper()
-        while not is_valid_move(bd,dir):
-            dir = input('enter valid move:\n').upper() # TODO: clearer message
-        clear_screen()
-        bd.move(dir)
-        # TODO: valid move checker, move is not valid if it doesn't more any tiles
-        bd.new_tile()
-        print(bd)
-
-def instructions():
-    pass
+    game_start(bd)
+    game_loop(bd)
+    game_end()
 
 def clear_screen():
     system('clear')
+
+def game_start(bd: Board):
+    print("Welcome to 2048!")
+    input("To start, press any key\n")
+    clear_screen()
+
+def game_loop(bd: Board):
+    while not game_over(bd):
+        print(bd)
+        print("OPTIONS")
+        print("(W) UP\n(D) RIGHT\n(S) DOWN\n(A) LEFT\n(Q) QUIT\n(R) RESTART")
+        dir = input('Enter your move:\n').upper()
+        while dir != "Q" and dir != "R" and not is_valid_move(bd,dir):
+            dir = input('Enter a valid move:\n').upper()
+        if dir == "Q":
+            break
+        if dir == "R":
+            clear_screen()
+            bd = Board()
+            print("Here is a new board")
+            continue
+        clear_screen()
+        bd.move(dir)
+        bd.new_tile()        
 
 def is_valid_move(bd: Board, dir: str):
     """returns where move dir is valid
@@ -77,6 +98,10 @@ def game_over(bd: Board):
     if got_2048(): return 1
     if no_legal_moves(): return 2
     return 0
+
+def game_end():
+    clear_screen()
+    print("Thanks for playing!")
 
 if __name__ == "__main__":
     main()
