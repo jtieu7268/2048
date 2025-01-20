@@ -2,8 +2,7 @@ from board import Board
 from os import system
 from time import sleep
 
-# TODO: documentation in board and play_2048
-# TODO: testing for play_2048 functions
+# TODO: testing for play_2048 functions is_valid_move, score from move of board
 # TODO: continue playing after 2048
 # TODO: optimizations: is_valid_move
 # TODO: board as row and col of linked lists
@@ -144,7 +143,7 @@ def game_end(score: int):
     """displays score of the game and bids adieu to player through print statements
 
     """
-    
+
     clear_screen()
     print(f'Your score was {score}')
     print("Thanks for playing!")
