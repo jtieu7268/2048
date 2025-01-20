@@ -2,7 +2,11 @@ from board import Board
 from os import system
 from time import sleep
 
-move_key = {"W":"U","D":"R","S":"D","A":"L"}
+move_key = {"W":"U",
+            "D":"R",
+            "S":"D",
+            "A":"L"}
+game_key = ["W","D","S","A","R","Q"]
 
 def main():
     game_start()
@@ -47,7 +51,11 @@ def game_loop() -> int:
         print("OPTIONS")
         print("(W) UP\n(D) RIGHT\n(S) DOWN\n(A) LEFT\n(Q) QUIT\n(R) RESTART")
         dir = input('Enter your move:\n').upper()
-        while dir != "Q" and dir != "R" and not is_valid_move(bd,dir):
+        while dir not in game_key or (dir in move_key and not bd.is_valid_move(move_key[dir])):
+            if dir not in game_key:
+                print("That is not a valid option. Please refer to the options above.")
+            else:
+                print("Your move did not move any tiles. Please select another direction.")
             dir = input('Enter a valid move:\n').upper()
         if dir == "Q":
             break
