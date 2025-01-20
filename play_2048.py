@@ -32,7 +32,7 @@ def game_loop() -> int:
     """
 
     bd = Board()
-    score = 0
+    high_score = score = 0
     status = game_over_status(bd)
     won = False
     while status != 2:
@@ -52,6 +52,7 @@ def game_loop() -> int:
         if dir == "R":
             clear_screen()
             bd = Board()
+            if score > high_score: high_score = score
             score = 0
             print("Here is a new board")
             continue
@@ -59,7 +60,7 @@ def game_loop() -> int:
         score += bd.move(dir)
         bd.new_tile()
         status = game_over_status(bd,won)
-    return score   
+    return high_score
 
 def is_valid_move(bd: Board, dir: str) -> bool:
     """returns whether move dir is valid
@@ -151,7 +152,7 @@ def game_end(score: int):
     """
 
     clear_screen()
-    print(f'Your score was {score}')
+    print(f'Your high score was {score}')
     print("Thanks for playing!")
 
 if __name__ == "__main__":
