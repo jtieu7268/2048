@@ -2,20 +2,16 @@ from board import Board
 from os import system
 from time import sleep
 
-# TODO: game instructions
 # TODO: score
 # TODO: continue playing after 2048
-# TODO: polish main method
-# TODO: polishing look
-# TODO: end game screen
 # TODO: optimizations: is_valid_move
 # TODO: board as row and col of linked lists
 
 def main():
     bd = Board()
     game_start(bd)
-    game_loop(bd)
-    game_end()
+    score = game_loop(bd)
+    game_end(score)
 
 def clear_screen():
     system('clear')
@@ -25,8 +21,10 @@ def game_start(bd: Board):
     input("To start, press any key\n")
     clear_screen()
 
-def game_loop(bd: Board):
+def game_loop(bd: Board) -> int:
+    score = 0
     while not game_over(bd):
+        print(f"SCORE: {score}")
         print(bd)
         print("OPTIONS")
         print("(W) UP\n(D) RIGHT\n(S) DOWN\n(A) LEFT\n(Q) QUIT\n(R) RESTART")
@@ -41,25 +39,30 @@ def game_loop(bd: Board):
             print("Here is a new board")
             continue
         clear_screen()
-        bd.move(dir)
-        bd.new_tile()        
+        score += bd.move(dir)
+        bd.new_tile()     
+    return score   
 
 def is_valid_move(bd: Board, dir: str):
     """returns where move dir is valid
         
         move is valid if it corresponds to a letter in ["W","D","S","A"] and
         if it changes the board tiles
+
+        prints a message to clarify how to make move valid
     """
 
     if dir in ["W","D","S","A"]:
         old_tiles = [[tile for tile in row] for row in bd.tiles]
         bd.move(dir)
         if bd.tiles == old_tiles:
+            print("Your move did not move any tiles. Please select another direction.")
             return 0
         else:
             bd.tiles = old_tiles
             return 1
     else:
+        print("That is not a valid option. Please refer to the options above.")
         return 0
 
 def game_over(bd: Board):
@@ -99,8 +102,9 @@ def game_over(bd: Board):
     if no_legal_moves(): return 2
     return 0
 
-def game_end():
+def game_end(score: int):
     clear_screen()
+    print(f'Your score was {score}')
     print("Thanks for playing!")
 
 if __name__ == "__main__":

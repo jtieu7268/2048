@@ -55,7 +55,7 @@ class Board:
         
         self.tiles[r][c] = new_value()
     
-    def move(self,dir):
+    def move(self,dir: str) -> int:
         """modifies board tiles according to direction dir
 
         tiles slide in chosen direction based on the following:
@@ -72,8 +72,13 @@ class Board:
             "D": RIGHT
             "S": DOWN
             "A": LEFT
-        """
 
+        returns
+        -------
+        int
+            the sum of all the merged tiles resulting from moving tiles in direction dir
+        """
+        score = 0
         is_horizontal = dir == "A" or dir == "D"
         tiles = self.tiles if is_horizontal else zip(*self.tiles)
         # check each vector in direction of dir
@@ -95,9 +100,11 @@ class Board:
                     if prev_tile_pos != -1 and (is_horizontal_merge or is_vertical_merge):
                         if is_horizontal_merge:
                             self.tiles[i][prev_tile_pos] *= 2
+                            score += self.tiles[i][prev_tile_pos]
                             self.tiles[i][j_actual] = 0
                         else:
                             self.tiles[prev_tile_pos][i] *= 2
+                            score += self.tiles[prev_tile_pos][i]
                             self.tiles[j_actual][i] = 0
                         empty_queue.append(j_actual)
                         prev_tile_pos = -1
@@ -116,6 +123,7 @@ class Board:
                         # tile does not move because no further empty spaces and no merging possible
                         else:
                             prev_tile_pos = j_actual
+        return score
 
     def __str__(self) -> str:
         NUM_SPACES = 7
