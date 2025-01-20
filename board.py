@@ -1,5 +1,38 @@
-from random import choices, choice
+from random import choice
 import math
+
+def transpose(tiles: list) -> list:
+    """returns a copy of tiles transposed
+
+    parameters
+    ----------
+    tiles : list
+        2d array
+
+    returns
+    -------
+    list
+        tiles transposed
+    """
+
+    return list(map(list,zip(*tiles)))
+    
+def reverse(tiles: list) -> list:
+    """returns a copy of tiles reversed left to right
+
+    parameters
+    ----------
+    tiles : list
+        2d array
+    
+    returns
+    -------
+    list
+        tiles reversed left to right
+
+    """
+
+    return [vector[::-1] for vector in tiles]
 
 class Board:
     """a class representing board for playing 2048
@@ -23,14 +56,10 @@ class Board:
         modifies board tiles according to direction dir, generates new tile if possible
     is_end()
         # TODO: implement and decide if want to separate
-    transpose(tiles: list) -> list
-        returns a copy of tiles transposed
-    reverse(tiles: list) ->
-        returns a copy of tiles reversed
     """
 
     DIM = 4
-    START_VALS = [2] * 9 + [4]
+    START_VALS = [2] * 9 + [4] # 90% prob of 2, 10% prob of 1
 
     def __init__(self, win_val: int = 2048):
         
@@ -50,7 +79,8 @@ class Board:
         # generate random position from open positions on the board
         r,c = choice([(i,j) for i in range(self.DIM) for j in range(self.DIM) if self.tiles[i][j] == 0])
 
-        self.tiles[r][c] = choices(self.START_VALS)[0]
+        # generate random value from start values
+        self.tiles[r][c] = choice(self.START_VALS)
     
     def move(self,dir: str) -> int:
         """modifies board tiles according to direction dir

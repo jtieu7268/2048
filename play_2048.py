@@ -60,6 +60,7 @@ def game_loop() -> int:
         score += bd.move(dir)
         bd.new_tile()
         status = game_over_status(bd,won)
+    if score > high_score: high_score = score
     return high_score
 
 def is_valid_move(bd: Board, dir: str) -> bool:

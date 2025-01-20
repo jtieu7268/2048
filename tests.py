@@ -1,5 +1,5 @@
 import unittest
-from board import Board
+from board import Board, transpose, reverse
 import play_2048
 
 class test_board_init(unittest.TestCase):
@@ -11,6 +11,22 @@ class test_board_init(unittest.TestCase):
         self.assertEqual(len(bd.tiles[0]),bd.DIM,f'number of cols is {len(bd.tiles[0])} instead of {bd.DIM}')
         num_init_tiles = sum(sum(r) for r in [[1 if t != 0 else 0 for t in row] for row in bd.tiles])
         self.assertEqual(num_init_tiles,2,f'number of initialized tiles is {num_init_tiles} instead of 2')
+
+class test_transpose(unittest.TestCase):
+
+    def test_transpose_identity(self):
+        self.assertEqual(transpose([[2,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,2]]),[[2,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,2]])
+
+    def test_transpose_example(self):
+        self.assertEqual(transpose([[2,2,0,0],[0,0,4,0],[0,4,0,0],[16,0,0,0]]),[[2,0,0,16],[2,0,4,0],[0,4,0,0],[0,0,0,0]])
+
+class test_reverse(unittest.TestCase):
+
+    def test_reverse_identity(self):
+        self.assertEqual(reverse([[2,0,0,0],[0,2,0,0],[0,0,2,0],[0,0,0,2]]),[[0,0,0,2],[0,0,2,0],[0,2,0,0],[2,0,0,0]])
+
+    def test_reverse_example(self):
+        self.assertEqual(reverse([[2,2,0,0],[0,0,4,0],[0,4,0,0],[16,0,0,0]]),[[0,0,2,2],[0,4,0,0],[0,0,4,0],[0,0,0,16]])
 
 class test_board_move(unittest.TestCase):
 
