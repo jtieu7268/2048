@@ -2,8 +2,6 @@ from board import Board
 from os import system
 from time import sleep
 
-# TODO: testing for play_2048 functions is_valid_move, score from move of board
-# TODO: continue playing after 2048
 # TODO: optimizations: is_valid_move
 # TODO: board as row and col of linked lists
 
@@ -43,7 +41,13 @@ def game_loop(bd: Board) -> int:
     """
 
     score = 0
-    while not game_over(bd):
+    status = game_over_status(bd)
+    won = False
+    while status != 2:
+        if status == 1:
+            won = True
+            print("Congratulations, you got 2048!")
+            input("Press any key to continue\n")
         print(f"SCORE: {score}")
         print(bd)
         print("OPTIONS")
@@ -56,11 +60,13 @@ def game_loop(bd: Board) -> int:
         if dir == "R":
             clear_screen()
             bd = Board()
+            score = 0
             print("Here is a new board")
             continue
         clear_screen()
         score += bd.move(dir)
-        bd.new_tile()     
+        bd.new_tile()
+        status = game_over_status(bd,won)
     return score   
 
 def is_valid_move(bd: Board, dir: str) -> bool:
@@ -97,16 +103,18 @@ def is_valid_move(bd: Board, dir: str) -> bool:
         print("That is not a valid option. Please refer to the options above.")
         return False
 
-def game_over(bd: Board) -> int:
-    """returns whether board is playable or game is over
+def game_over_status(bd: Board, won: bool=False) -> int:
+    """returns status of the game board
 
-    if board is playable, returns 0 (game is not over)
-    if game is over, returns 1 if board contains 2048 and 2 if there are no legal moves
+    if board is playable, returns 0 (game is not over) or returns 1 if board contains 2048
+    if game is over, returns 2 (there are no legal moves)
 
     paramaters
     ----------
     bd : Board
         the current game board
+    won : bool
+        boolean indicating whether game has been won i.e. if 2048 tile has been created
 
     returns
     -------
@@ -135,7 +143,7 @@ def game_over(bd: Board) -> int:
                         prev_val_pos = i
             return 1
                         
-    if got_2048(): return 1
+    if not won and got_2048(): return 1
     if no_legal_moves(): return 2
     return 0
 

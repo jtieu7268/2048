@@ -548,37 +548,46 @@ class test_is_valid_move(unittest.TestCase):
         bd.tiles = [[4,2,0,0],[2,0,0,0],[0,0,0,0],[0,0,0,0]]
         self.assertEqual(play_2048.is_valid_move(bd,"W"),False)
 
-class test_game_over(unittest.TestCase):
+class test_game_over_status(unittest.TestCase):
     
     def test_not_game_over_board_vertical_full(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over(bd),0)
+        self.assertEqual(play_2048.game_over_status(bd),0)
     
     def test_not_game_over_board_horizontal_full(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[2,4,8,128],[8,8,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over(bd),0)
+        self.assertEqual(play_2048.game_over_status(bd),0)
 
     def test_game_over_board_full(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[2,4,8,128],[8,32,64,1024],[128,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over(bd),2)
+        self.assertEqual(play_2048.game_over_status(bd),2)
 
     def test_not_game_over_board_not_full(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[0,8,16,64]]
-        self.assertEqual(play_2048.game_over(bd),0)
+        self.assertEqual(play_2048.game_over_status(bd),0)
 
     def test_game_over_2048(self):
         bd = Board()
         reset_board(bd)
         bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
-        self.assertEqual(play_2048.game_over(bd),1)
+        self.assertEqual(play_2048.game_over_status(bd),1)
+
+class test_game_loop(unittest.TestCase):
+
+    def test_game_loop_win(self):
+        bd = Board()
+        bd.tiles[0][0] = 1024
+        bd.tiles[1][0] = 1024
+        # move up then quit
+        play_2048.game_loop(bd)
 
 def reset_board(bd: Board):
     bd.tiles = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
