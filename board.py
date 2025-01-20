@@ -1,4 +1,4 @@
-import random
+from random import choices, choice
 import math
 
 class Board:
@@ -12,21 +12,30 @@ class Board:
         the dimension of each side of the board
     START_VALS : list
         a list of possible values for new tiles on the board
-
+    WIN_VAL : int
+        the value of the tile to form to win    
+    
     methods
     -------
     new_tile()
         generates a new tile with a start value at an open location on the board
-    move(dir: str)
-        modifies board tiles according to direction dir
+    move(dir: str) -> bool
+        modifies board tiles according to direction dir, generates new tile if possible
+    is_end()
+        # TODO: implement and decide if want to separate
+    transpose(tiles: list) -> list
+        returns a copy of tiles transposed
+    reverse(tiles: list) ->
+        returns a copy of tiles reversed
     """
 
     DIM = 4
-    START_VALS = [2,2,2,2,2,2,2,2,2,4]
+    START_VALS = [2] * 9 + [4]
 
-    def __init__(self):
+    def __init__(self, win_val: int = 2048):
         
         self.tiles = [[0] * self.DIM for _ in range(self.DIM)]
+        self.WIN_VAL = win_val
         
         # generate first two tiles
         self.new_tile()
@@ -37,20 +46,11 @@ class Board:
 
         directly modifies board tiles
         """
+        
+        # generate random position from open positions on the board
+        r,c = choice([(i,j) for i in range(self.DIM) for j in range(self.DIM) if self.tiles[i][j] == 0])
 
-        # function to generate start value
-        def new_value():
-            return random.choices(self.START_VALS)[0]
-        
-        # generate random position
-        r = random.randint(0,self.DIM-1)
-        c = random.randint(0,self.DIM-1)
-        # keep regenerating position until position is unoccupied 
-        while self.tiles[r][c]:
-            r = random.randint(0,self.DIM-1)
-            c = random.randint(0,self.DIM-1)
-        
-        self.tiles[r][c] = new_value()
+        self.tiles[r][c] = choices(self.START_VALS)[0]
     
     def move(self,dir: str) -> int:
         """modifies board tiles according to direction dir
