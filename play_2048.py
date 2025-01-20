@@ -2,7 +2,8 @@ from board import Board
 from os import system
 from time import sleep
 
-# TODO: score
+# TODO: documentation in board and play_2048
+# TODO: testing for play_2048 functions
 # TODO: continue playing after 2048
 # TODO: optimizations: is_valid_move
 # TODO: board as row and col of linked lists
@@ -17,11 +18,31 @@ def clear_screen():
     system('clear')
 
 def game_start(bd: Board):
+    """introduces game through print statements
+
+    welcomes player into game
+    prompts player to acknowlege by pressing any key
+    clears terminal screen
+    """
+
     print("Welcome to 2048!")
     input("To start, press any key\n")
     clear_screen()
 
 def game_loop(bd: Board) -> int:
+    """main game loop which iteratively requests command or move direction from player, moves tiles, and tracks score
+
+    parameters
+    ----------
+    bd : Board
+        the game board
+
+    returns
+    -------
+    int
+        represents the score of the game i.e. the sum of all merged tiles during the game
+    """
+
     score = 0
     while not game_over(bd):
         print(f"SCORE: {score}")
@@ -43,13 +64,25 @@ def game_loop(bd: Board) -> int:
         bd.new_tile()     
     return score   
 
-def is_valid_move(bd: Board, dir: str):
-    """returns where move dir is valid
+def is_valid_move(bd: Board, dir: str) -> bool:
+    """returns whether move dir is valid
         
-        move is valid if it corresponds to a letter in ["W","D","S","A"] and
-        if it changes the board tiles
+    move is valid if it corresponds to a letter in ["W","D","S","A"] and if it changes the board tiles
 
-        prints a message to clarify how to make move valid
+    prints a message to clarify how to make move valid
+    
+    parameters
+    ----------
+    bd : Board
+        the game board
+    dir : str
+        the input from player
+
+    returns
+    -------
+    bool
+        True if dir is a valid move, else False
+
     """
 
     if dir in ["W","D","S","A"]:
@@ -57,15 +90,15 @@ def is_valid_move(bd: Board, dir: str):
         bd.move(dir)
         if bd.tiles == old_tiles:
             print("Your move did not move any tiles. Please select another direction.")
-            return 0
+            return False
         else:
             bd.tiles = old_tiles
-            return 1
+            return True
     else:
         print("That is not a valid option. Please refer to the options above.")
-        return 0
+        return False
 
-def game_over(bd: Board):
+def game_over(bd: Board) -> int:
     """returns whether board is playable or game is over
 
     if board is playable, returns 0 (game is not over)
@@ -75,6 +108,11 @@ def game_over(bd: Board):
     ----------
     bd : Board
         the current game board
+
+    returns
+    -------
+    int
+        the status of the game, 0 if game is not over, 1 if board contains 2048, 2 if there are no legal moves
     """
 
     def is_in_board(val: int):
@@ -103,6 +141,10 @@ def game_over(bd: Board):
     return 0
 
 def game_end(score: int):
+    """displays score of the game and bids adieu to player through print statements
+
+    """
+    
     clear_screen()
     print(f'Your score was {score}')
     print("Thanks for playing!")

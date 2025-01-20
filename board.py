@@ -2,7 +2,7 @@ import random
 import math
 
 class Board:
-    """ a class representing board for playing 2048
+    """a class representing board for playing 2048
 
     attributes
     ----------
@@ -12,7 +12,7 @@ class Board:
         the dimension of each side of the board
     START_VALS : list
         a list of possible values for new tiles on the board
-    START_VALS : list
+    START_VALS_WEIGHTS : list
         a list of the weights representing the likelihood of generating the respective START_VALS
 
     methods
@@ -38,7 +38,7 @@ class Board:
     def new_tile(self):
         """generates a new tile with a start value at an open location on the board
 
-            directly modifies board tiles
+        directly modifies board tiles
         """
 
         # function to generate start value
