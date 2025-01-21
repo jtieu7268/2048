@@ -512,38 +512,6 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[3][3] = 64
         self.assertEqual(bd.move("L"),160)
 
-class test_game_over_status(unittest.TestCase):
-    
-    def test_not_game_over_board_vertical_full(self):
-        bd = Board()
-        reset_board(bd)
-        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over_status(bd),0)
-    
-    def test_not_game_over_board_horizontal_full(self):
-        bd = Board()
-        reset_board(bd)
-        bd.tiles = [[2,4,8,128],[8,8,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over_status(bd),0)
-
-    def test_game_over_board_full(self):
-        bd = Board()
-        reset_board(bd)
-        bd.tiles = [[2,4,8,128],[8,32,64,1024],[128,16,128,256],[2,8,16,64]]
-        self.assertEqual(play_2048.game_over_status(bd),2)
-
-    def test_not_game_over_board_not_full(self):
-        bd = Board()
-        reset_board(bd)
-        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[0,8,16,64]]
-        self.assertEqual(play_2048.game_over_status(bd),0)
-
-    def test_game_over_2048(self):
-        bd = Board()
-        reset_board(bd)
-        bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
-        self.assertEqual(play_2048.game_over_status(bd),1)
-
 class test_board_is_end(unittest.TestCase):
 
     def test_board_is_end_win(self):
@@ -564,6 +532,30 @@ class test_board_is_end(unittest.TestCase):
         bd.tiles = [[512,64,4,2],[128,64,2,0],[64,0,0,0],[0,0,0,0]]
         self.assertEqual(bd.is_end(),1)
 
+    def test_not_end_board_vertical_full(self):
+        bd = Board()
+        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
+        self.assertEqual(bd.is_end(),0)
+    
+    def test_not_end_board_horizontal_full(self):
+        bd = Board()
+        bd.tiles = [[2,4,8,128],[8,8,64,1024],[4,16,128,256],[2,8,16,64]]
+        self.assertEqual(bd.is_end(),0)
+
+    def test_end_board_full(self):
+        bd = Board()
+        bd.tiles = [[2,4,8,128],[8,32,64,1024],[128,16,128,256],[2,8,16,64]]
+        self.assertEqual(bd.is_end(),2)
+
+    def test_not_end_board_not_full(self):
+        bd = Board()
+        bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[0,8,16,64]]
+        self.assertEqual(bd.is_end(),0)
+
+    def test_end_2048(self):
+        bd = Board()
+        bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
+        self.assertEqual(bd.is_end(),1)
 
 def reset_board(bd):
     bd.tiles = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]

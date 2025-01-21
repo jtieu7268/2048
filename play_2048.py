@@ -7,6 +7,7 @@ move_key = {"W":"U",
             "S":"D",
             "A":"L"}
 game_key = ["W","D","S","A","R","Q"]
+win_val_options = ["2048", "1024", "512", "256", "128"]
 
 def main():
     game_start()
@@ -37,15 +38,25 @@ def game_loop() -> int:
         represents the score of the game i.e. the sum of all merged tiles during the game
     """
 
-    bd = Board()
+    print("What do you want to be the win value?")
+    win_val = input("Please enter one of the following or press enter to use default (2048): [2048, 1024, 512, 256, 128]\n")
+    while win_val != "" and win_val not in win_val_options:
+        win_val = input("Please enter a valid option or press enter to use default (2048): [2048, 1024, 512, 256, 128]\n")
+    if win_val == "": 
+        bd = Board()
+        win_val = 2048
+    else: 
+        win_val = int(win_val)
+        bd = Board(win_val=win_val)
     high_score = score = 0
     status = bd.is_end()
     won = False
     while status != 2:
         if status == 1:
             won = True
-            print("Congratulations, you got 2048!")
+            print(f"Congratulations, you got {win_val}!")
             input("Press any key to continue\n")
+            clear_screen()
         print(f"SCORE: {score}")
         print(bd)
         print("OPTIONS")
