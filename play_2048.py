@@ -1,6 +1,5 @@
 from board import Board
 from os import system
-from time import sleep
 
 def clear_screen():
     system('clear')
