@@ -6,6 +6,46 @@ def clear_screen():
 
 class Game:
 
+    """a class representing board for playing 2048
+
+    attributes
+    ----------
+    MOVE_KEY : dict[str, str]
+        keys for game associated with their direction
+        U = UP
+        R = RIGHT
+        D = DOWN
+        L = LEFT
+    GAME_KEY : list[str]
+        valid keys for playing game
+    WIN_VAL_OPTIONS : list[str]
+        options for game win values
+    BOARD_STATE_KEY : dict[int, str]
+        number states tied to their semantic state
+    score : int
+        current game score
+    high_score : int
+        high score from all games played during session
+    won : bool
+        whether the game is won
+    board : Board
+        the board associated with the game
+    WIN_VAL : int
+        the win value of the current session
+    
+    methods
+    -------
+    start()
+        introduces the game through print statements and sets up the game
+    reset()
+        starts a new game, asks player for new win value and initializes board accordingly
+    loop()
+        the game loop for each new game
+    end()
+        displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements
+
+    """
+
     MOVE_KEY = {"W":"U",
                 "D":"R",
                 "S":"D",
@@ -61,6 +101,10 @@ class Game:
         clear_screen()
 
     def loop(self):
+        """the game loop
+
+        """
+
         status = self.board.is_end()
         while self.BOARD_STATE_KEY[status] != "END":
             if self.BOARD_STATE_KEY[status] == "WIN":

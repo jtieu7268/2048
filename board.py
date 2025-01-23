@@ -7,11 +7,11 @@ class Board:
 
     attributes
     ----------
-    tiles : list
+    tiles : list[list[Board]]
         the tiles of the board represented as a 2d array
     DIM : int
         the dimension of each side of the board
-    START_VALS : list
+    START_VALS : list[int]
         a list of possible values for new tiles on the board
     WIN_VAL : int
         the value of the tile to form to win
@@ -20,13 +20,13 @@ class Board:
     
     methods
     -------
-    transpose(tiles: list) -> list
+    transpose(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles transposed
-    reverse(tiles: list) -> list
+    reverse(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles reversed left to right
-    process_tiles(dir: str) -> list
+    process_tiles(dir: str) -> list[list[int]]
         processes board tiles based on direction dir so move related methods can be applied generally independent of direction
-    unprocess_tiles(tiles: list, dir: str) -> tiles
+    unprocess_tiles(tiles: list, dir: str) -> list[list[int]]
         unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
     is_valid_move(dir: str) -> bool
         returns whether moving tiles in direction dir results in a change in the board tiles    
@@ -51,7 +51,7 @@ class Board:
         self.new_tile()
         self.new_tile()
     
-    def transpose(tiles: list) -> list:
+    def transpose(tiles: list[list[int]]) -> list[list[int]]:
         """returns a copy of tiles transposed
 
         parameters
@@ -67,7 +67,7 @@ class Board:
 
         return list(map(list,zip(*tiles)))
         
-    def reverse(tiles: list) -> list:
+    def reverse(tiles: list[list[int]]) -> list[list[int]]:
         """returns a copy of tiles reversed left to right
 
         parameters
@@ -84,7 +84,7 @@ class Board:
 
         return [vector[::-1] for vector in tiles]
 
-    def process_tiles(self, dir: str) -> list:
+    def process_tiles(self, dir: str) -> list[list[int]]:
         """processes board tiles based on direction dir so move-related methods can be applied generally independent of direction
 
         parameters
@@ -105,7 +105,7 @@ class Board:
             tiles = Board.reverse(tiles)
         return tiles
 
-    def unprocess_tiles(self, tiles: list, dir: str) -> list:
+    def unprocess_tiles(self, tiles: list[list[int]], dir: str) -> list[list[int]]:
         """unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
 
         parameters
