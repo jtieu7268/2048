@@ -50,8 +50,8 @@ class Game:
                 "D":"R",
                 "S":"D",
                 "A":"L"}
-    GAME_KEY = ["W","D","S","A","R","Q"]
-    WIN_VAL_OPTIONS = ["2048", "1024", "512", "256", "128"]
+    GAME_KEY = ("W","D","S","A","R","Q")
+    WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
     BOARD_STATE_KEY = {0: "PLAY",
                        1: "WIN",
                        2: "END",

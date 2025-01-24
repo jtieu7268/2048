@@ -9,12 +9,16 @@ class Board:
     ----------
     tiles : list[list[Board]]
         the tiles of the board represented as a 2d array
+    
     DIM : int
         the dimension of each side of the board
+    
     START_VALS : list[int]
         a list of possible values for new tiles on the board
+    
     WIN_VAL : int
         the value of the tile to form to win
+    
     MOVES : str
         valid moves: U: UP, R: RIGHT, D: DOWN, L: LEFT
     
@@ -22,18 +26,25 @@ class Board:
     -------
     transpose(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles transposed
+    
     reverse(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles reversed left to right
+    
     process_tiles(dir: str) -> list[list[int]]
         processes board tiles based on direction dir so move related methods can be applied generally independent of direction
+    
     unprocess_tiles(tiles: list, dir: str) -> list[list[int]]
         unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
+    
     is_valid_move(dir: str) -> bool
         returns whether moving tiles in direction dir results in a change in the board tiles    
+    
     new_tile()
         generates a new tile with a start value at an open location on the board
+    
     move(dir: str) -> int
         modifies board tiles according to direction dir, returns score from move
+    
     is_end()
         returns status of the board tiles, 0 if not the end, 1 if game is won, 2 if no legal moves left and game is over
     """
@@ -265,6 +276,35 @@ class Board:
         if not won and got_win_val(): return 1
         if no_legal_moves(): return 2
         return 0
+
+    def play_round(self, dir: str, won: bool) -> tuple[int, int]:
+        """executes a round of 2048 including moving bd in direction dir, assuming valid move, generates next tile if possible, returns score from move and state of board
+
+        parameters
+        ----------
+        dir : str
+            the direction to move tiles, dir is in MOVES
+            "U": UP
+            "R": RIGHT
+            "D": DOWN
+            "L": LEFT
+            
+        won : bool
+            boolean indicating whether game has been won i.e. if tile with WIN_VAL has been created
+
+        returns
+        -------
+        int
+            the sum of all the merged tiles resulting from moving tiles in direction dir
+
+        int
+            the status of the game, 0 if game is not over, 1 if board contains WIN_VAL, 2 if there are no legal moves
+        """
+
+        score = self.move(dir)
+        self.new_tile()
+        state = self.is_end(won)
+        return score, state
 
     def __str__(self) -> str:
         NUM_SPACES = 7
