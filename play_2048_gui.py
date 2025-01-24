@@ -49,7 +49,13 @@ class GameState(Enum):
     END = 2
     QUIT = 3
 
-GAME_KEY = ("W","D","S","A","R","Q")
+GAME_KEY = {"W":"UP",
+            "D":"RIGHT",
+            "S":"DOWN",
+            "A":"LEFT",
+            "R":
+            "RESTART",
+            "Q":"QUIT"}
 WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
 
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) / 2
@@ -150,8 +156,15 @@ def game_loop(window, high_score=0):
         ])
 
     def draw_footer(window):
-        pygame.draw.rect(window, FULL_SCREEN_COLOR, (0, SCREEN_HEIGHT - FOOTER_HEIGHT, FOOTER_WIDTH, FOOTER_HEIGHT))
-
+        FONT_FOOTER = pygame.font.SysFont('Arial', 30, bold=True)
+        pygame.draw.rect(window, 
+                         FULL_SCREEN_COLOR, 
+                         (LINE_THICKNESS, SCREEN_HEIGHT - FOOTER_HEIGHT, FOOTER_WIDTH - 2 * LINE_THICKNESS, FOOTER_HEIGHT - LINE_THICKNESS),
+                         border_radius=int(FOOTER_HEIGHT / 10))
+        instructions = FONT_FOOTER.render("Use arrow keys or WASD to slide tiles", 1, BACKGROUND_COLOR)
+        options = FONT_FOOTER.render("R - RESTART    Q - QUIT", 1, BACKGROUND_COLOR)
+        window.blits([(instructions, ((FOOTER_WIDTH - 2 * LINE_THICKNESS) / 2 - instructions.get_width() / 2, SCREEN_HEIGHT - 3 * FOOTER_HEIGHT / 4 - instructions.get_height() / 2)),
+                     (options, ((FOOTER_WIDTH - 2 * LINE_THICKNESS) / 2 - options.get_width() / 2, SCREEN_HEIGHT - FOOTER_HEIGHT / 3 - options.get_height() / 2))])
 
     def draw(window, bd, score, high_score):
         window.fill(BACKGROUND_COLOR)
@@ -180,7 +193,7 @@ def game_loop(window, high_score=0):
     run = True
 
     bd = Board(win_val=1024)
-    score = high_score
+    score = 0
 
     while run:
         clock.tick(FPS)
@@ -253,11 +266,11 @@ def game_end(window, score):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
-                    return GameState.PLAY
+                    return GameState.PLAY, score
                 if event.key == pygame.K_q:
-                    return GameState.QUIT
+                    return GameState.QUIT, score
     
-    return GameState.QUIT
+    return GameState.QUIT, score
 
 
 def main():
@@ -275,12 +288,12 @@ def main():
             pygame.quit()
             return
         if game_state == GameState.PLAY:
-            game_state, high_score = game_loop(window)
+            game_state, high_score = game_loop(window, high_score)
         if game_state == GameState.QUIT:
             pygame.quit()
             return
         if game_state == GameState.END:
-            game_state = game_end(window, high_score)
+            game_state, high_score = game_end(window, high_score)
 
 
 if __name__ ==  "__main__":
