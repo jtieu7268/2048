@@ -155,13 +155,16 @@ class Board:
         """generates a new tile with a start value at an open location on the board
 
         directly modifies board tiles
+
         """
         
         # generate random position from open positions on the board
-        r,c = choice([(i,j) for i in range(self.DIM) for j in range(self.DIM) if self.tiles[i][j] == 0])
+        open_loc = [(i,j) for i in range(self.DIM) for j in range(self.DIM) if self.tiles[i][j] == 0]
+        if open_loc:
+            r,c = choice(open_loc)
 
-        # generate random value from start values
-        self.tiles[r][c] = choice(self.START_VALS)
+            # generate random value from start values
+            self.tiles[r][c] = choice(self.START_VALS)
 
     def move(self,dir: str) -> int:
         """modifies board tiles according to direction dir
@@ -226,6 +229,7 @@ class Board:
 
         if board is playable, returns 0 (game is not over) or returns 1 if board tiles contains WIN_VAL
         if game is over, returns 2 (there are no legal moves)
+        
         paramaters
         ----------
         won : bool
