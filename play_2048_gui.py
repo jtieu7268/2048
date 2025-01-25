@@ -3,10 +3,10 @@ import pygame
 from enum import Enum
 
 # window related constants
-
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
 FPS = 60
+game_font = "Arial"
 
 # header and score related constants
 HEADER_WIDTH = SCREEN_WIDTH
@@ -17,7 +17,6 @@ FOOTER_WIDTH = SCREEN_WIDTH
 FOOTER_HEIGHT = SCREEN_HEIGHT / 8
 
 # board related constants
-
 BOARD_WIDTH = BOARD_HEIGHT = SCREEN_WIDTH
 DIM = 4
 
@@ -41,7 +40,6 @@ VALUE_TO_COLOR = dict(zip([0] + [2**i for i in range(1,14)],
                         (178,80,255)]))
 
 # game related constants
-
 class GameState(Enum):
     INTRO = -1
     PLAY = 0
@@ -50,20 +48,18 @@ class GameState(Enum):
     QUIT = 3
     RESTART = 4
 
-GAME_KEY = {"W":"UP",
-            "D":"RIGHT",
-            "S":"DOWN",
-            "A":"LEFT",
-            "R":
-            "RESTART",
-            "Q":"QUIT"}
+GAME_KEY = {"W" : "UP",
+            "D" : "RIGHT",
+            "S" : "DOWN",
+            "A" : "LEFT",
+            "R" : "RESTART",
+            "Q" : "QUIT"}
 WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
 
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) / 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
 # color constants
-
 BACKGROUND_COLOR = (220,230,245) # line color
 FONT_COLOR = (255,255,255)
 FULL_SCREEN_COLOR = (240,248,255) # temporary empty square color
@@ -94,11 +90,28 @@ board + play_2048 get gamestate enum?
 
 """
 
+class StateManager:
+    
+    def __init__(self):
+        pass
+
+    def start(self):
+        pass
+
+    def handle_events(self):
+        pass
+
+    def update(self):
+        pass
+
+    def render(self):
+        pass
+
 def game_intro(window):
-    FONT_INTRO = pygame.font.SysFont("Arial", 60, bold=True)
-    FONT_INTRO_SUB = pygame.font.SysFont("Arial", 30, bold=True)
     
     def draw_intro():
+        FONT_INTRO = pygame.font.SysFont(game_font, 60, bold=True)
+        FONT_INTRO_SUB = pygame.font.SysFont(game_font, 30, bold=True)
         window.fill(BACKGROUND_COLOR)
         welcome = FONT_INTRO.render("Welcome of 2048!", 1, FONT_COLOR)
         cont = FONT_INTRO_SUB.render("Press any key or click to continue", 1, FONT_COLOR)
@@ -108,14 +121,14 @@ def game_intro(window):
         pygame.display.update()
     
     clock = pygame.time.Clock()
-    run = True
+    intro = True
 
-    while run:
+    while intro:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                intro = False
                 break
 
             if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
@@ -127,39 +140,44 @@ def game_intro(window):
 
 def game_restart(window):
 
-    FONT_RESTART = pygame.font.SysFont("Arial", 50, bold=True)
-
     def draw_restart(window):
+        FONT_RESTART = pygame.font.SysFont(game_font, 50, bold=True)
         window.fill(BACKGROUND_COLOR)
         text = FONT_RESTART.render("What do you want the win value to be?", 1, FONT_COLOR)
         # TODO: buttons
         pygame.display.update()
     
-    clock = pygame.tick(FPS)
-    run = True
+    clock = pygame.time.Clock()
+    restart = True
+
+    win_val = 2048
     
-    while run:
+    while restart:
         clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
-                break
+                return GameState.QUIT, None
+            
+            # change win_val based on button clicked
 
         draw_restart(window)
+    
+    return GameState.PLAY, Board(win_val)
 
 def game_loop(window, bd, high_score=0):
     
-    FONT = pygame.font.SysFont("Arial", 50, bold=True)
-    
     def draw_tiles(window, bd):
+        
+        FONT_TILE = pygame.font.SysFont(game_font, 50, bold=True)
+        
         def draw_tile(tile, r, c):
             x = (TILE_WIDTH + LINE_THICKNESS) * c + LINE_THICKNESS
             y = (TILE_HEIGHT + LINE_THICKNESS) * r + LINE_THICKNESS + HEADER_HEIGHT
             color = VALUE_TO_COLOR[tile]
             pygame.draw.rect(window, color, (x, y, TILE_WIDTH, TILE_HEIGHT), border_radius=TILE_WIDTH // 10)
             tile_text = str(tile) if tile else ""
-            text = FONT.render(tile_text, 1, FONT_COLOR)
+            text = FONT_TILE.render(tile_text, 1, FONT_COLOR)
             window.blit(text,
                         (
                             x + TILE_WIDTH / 2 - text.get_width() / 2,
@@ -171,8 +189,8 @@ def game_loop(window, bd, high_score=0):
                 draw_tile(tile, r, c)
 
     def draw_header(window, score, high_score):
-        FONT_SCORE_HEADERS = pygame.font.SysFont('Arial', 30, bold=True)
-        FONT_SCORES = pygame.font.SysFont('Arial', 28, bold=True)
+        FONT_SCORE_HEADERS = pygame.font.SysFont(game_font, 30, bold=True)
+        FONT_SCORES = pygame.font.SysFont(game_font, 28, bold=True)
         pygame.draw.rect(window, 
                          FULL_SCREEN_COLOR, 
                          (LINE_THICKNESS, LINE_THICKNESS, SCORE_BOX_WIDTH, SCORE_BOX_HEIGHT), 
@@ -211,7 +229,7 @@ def game_loop(window, bd, high_score=0):
         ])
 
     def draw_footer(window):
-        FONT_FOOTER = pygame.font.SysFont('Arial', 30, bold=True)
+        FONT_FOOTER = pygame.font.SysFont(game_font, 30, bold=True)
         pygame.draw.rect(window, 
                          FULL_SCREEN_COLOR, 
                          (LINE_THICKNESS, SCREEN_HEIGHT - FOOTER_HEIGHT, FOOTER_WIDTH - 2 * LINE_THICKNESS, FOOTER_HEIGHT - LINE_THICKNESS),
@@ -247,8 +265,9 @@ def game_loop(window, bd, high_score=0):
     clock = pygame.time.Clock()
     run = True
 
-    bd = Board(win_val=1024)
+    bd = Board(win_val=32)
     score = 0
+    won = False
 
     while run:
         clock.tick(FPS)
@@ -263,14 +282,19 @@ def game_loop(window, bd, high_score=0):
                     if bd.is_valid_move(KEY_TO_MOVE[event.key]):
                         score += bd.move(KEY_TO_MOVE[event.key])
                         bd.new_tile()
-                        status = bd.is_end()
+                        status = bd.is_end(won)
                         if score > high_score: high_score = score
                         if status == GameState.END.value:
                             return GameState(status), bd, high_score
                         if status == GameState.WIN.value:
+                            won = True
                             draw(window, bd, score, high_score)
-                            pygame.time.wait(1000)
-                            return GameState.QUIT, bd, high_score
+                            FONT_WIN = pygame.font.SysFont(game_font, 30, bold=True)
+                            win_message = FONT_WIN.render("Congratulations, you won the game!", 1, FONT_COLOR)
+                            pygame.draw.rect(window, BACKGROUND_COLOR, (SCREEN_WIDTH / 2 - win_message.get_width() / 2, SCREEN_HEIGHT / 2 - win_message.get_height() / 2, win_message.get_width(), win_message.get_height()))
+                            window.blit(win_message, (SCREEN_WIDTH / 2 - win_message.get_width() / 2, SCREEN_HEIGHT / 2 - win_message.get_height() / 2))
+                            pygame.display.update()
+                            pygame.time.wait(2000)
                 if event.key == pygame.K_r:
                     return GameState.PLAY, bd, high_score
                 if event.key == pygame.K_q:
@@ -282,8 +306,8 @@ def game_loop(window, bd, high_score=0):
 
 def game_end(window, score):
 
-    FONT_GAMEOVER = pygame.font.SysFont('Arial', 60, bold=True)
-    FONT_MESSAGE = pygame.font.SysFont('Arial', 30, bold=True)
+    FONT_GAMEOVER = pygame.font.SysFont(game_font, 60, bold=True)
+    FONT_MESSAGE = pygame.font.SysFont(game_font, 30, bold=True)
 
     def draw_end(window, score):
         window.fill(BACKGROUND_COLOR)
@@ -340,19 +364,24 @@ def main():
     pygame.display.set_caption("2048")
 
     game_state = GameState.INTRO
-    high_score = 0
-    bd = Board()
 
     while True:
+        
         if game_state == GameState.INTRO:
+            high_score = 0
+            bd = Board() # erase once restart is fixed
             game_state = game_intro(window)
+        
         if game_state == GameState.RESTART:
             game_state, bd = game_restart(window)
+        
         if game_state == GameState.PLAY:
             game_state, bd, high_score = game_loop(window, bd, high_score)
+        
         if game_state == GameState.QUIT:
             pygame.quit()
             return
+        
         if game_state == GameState.END:
             game_state, high_score = game_end(window, high_score)
 
