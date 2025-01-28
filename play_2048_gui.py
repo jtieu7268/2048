@@ -54,7 +54,7 @@ GAME_KEY = {"W" : "UP",
             "A" : "LEFT",
             "R" : "RESTART",
             "Q" : "QUIT"}
-WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
+WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128", "64", "32", "16")
 
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
@@ -132,7 +132,7 @@ class IntroState(State):
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                self.manager.change_state(BoardState()) # change to reset state once implemented
+                self.manager.change_state(ResetState()) # change to reset state once implemented
 
     def update(self):
         pass
@@ -149,16 +149,55 @@ class IntroState(State):
 class ResetState(State):
 
     def __init__(self):
-        pass
+        self.font = pygame.font.SysFont(game_font, 30, bold=True)
+        self.font_sub = pygame.font.SysFont(game_font, 40, bold=True)
 
-    def handle_events(self):
-        pass
+    def handle_events(self, events):
+        KEY_TO_WIN_VAL = dict(zip(
+            (
+                pygame.K_1, 
+                pygame.K_2, 
+                pygame.K_3, 
+                pygame.K_4, 
+                pygame.K_5, 
+                pygame.K_6, 
+                pygame.K_7, 
+                pygame.K_8
+            ), WIN_VAL_OPTIONS))
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key in KEY_TO_WIN_VAL:
+                    self.manager.change_state(BoardState(int(KEY_TO_WIN_VAL[event.key])))
     
     def update(self):
         pass
 
-    def render(self):
-        pass
+    def render(self, window):
+
+        def draw_options():
+            options = []
+            for i, win_val in enumerate(WIN_VAL_OPTIONS):
+                options.append(self.font_sub.render(f"({i+1}) {win_val}", 1, FONT_COLOR))
+            OPTION_WIDTH = options[0].get_width() + LINE_THICKNESS
+            OPTION_HEIGHT = options[0].get_height() + LINE_THICKNESS
+            i = 0
+            for c in [-1, 1]:
+                x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - OPTION_WIDTH / 2
+                for r in range(4):
+                    y = 2 * SCREEN_HEIGHT / 5 + r * (OPTION_HEIGHT + 2 * LINE_THICKNESS)
+                    pygame.draw.rect(window, BACKGROUND_COLOR, (x, y, OPTION_WIDTH, OPTION_HEIGHT), border_radius=OPTION_HEIGHT // 10)
+                    window.blit(options[i], 
+                                (
+                                    x + OPTION_WIDTH / 2 - options[0].get_width() / 2, 
+                                    y + OPTION_HEIGHT / 2 - options[0].get_height() / 2
+                                ))
+                    i += 1
+                    
+        window.fill(FULL_SCREEN_COLOR)
+        select_value = self.font.render("Enter a number to select a win value.", 1, FONT_COLOR)
+        window.blit(select_value, (SCREEN_WIDTH / 2 - select_value.get_width() / 2, SCREEN_HEIGHT / 4 - select_value.get_height() / 2))
+        draw_options()
+        pygame.display.update()
 
 class PlayState(State):
 
@@ -176,13 +215,13 @@ class PlayState(State):
 
     def check_quit_reset(self, keydown):
         if keydown == pygame.K_r:
-            self.manager.change_state(BoardState())
+            self.manager.change_state(ResetState())
         if keydown == pygame.K_q:
             self.manager.change_state(EndState())
 
 class BoardState(PlayState):
 
-    def __init__(self, win_val=32):
+    def __init__(self, win_val=2048):
         self.font_tile = pygame.font.SysFont(game_font, 50, bold=True)
         self.font_score = pygame.font.SysFont(game_font, 28, bold=True)
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
@@ -319,12 +358,27 @@ class GameStatusState(PlayState):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 super().check_quit_reset(event.key)
-
-    def update(self):
-        pass
+                if event.key == pygame.K_p:
+                    self.manager.change_state(self.game_state)
+                    return
 
     def render(self, window):
-        pass
+        window.fill(BACKGROUND_COLOR)
+        score = self.font.render(f"Score: {self.game_state.score}", 1, FONT_COLOR)
+        high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, FONT_COLOR)
+        start_text_height = SCREEN_HEIGHT / 2 - (score.get_height() + high_score.get_height()) / 2
+        window.blits([
+            (score, 
+             (
+                 SCREEN_WIDTH / 2 - score.get_width() / 2, 
+                 start_text_height
+             )), 
+            (high_score, 
+             (
+                 SCREEN_WIDTH / 2 - high_score.get_width() / 2, 
+                 start_text_height + score.get_height()
+             )
+            )])
 
 class WinState(GameStatusState):
 
@@ -332,37 +386,26 @@ class WinState(GameStatusState):
         super().__init__(game_state)
         self.win_val = game_state.bd.WIN_VAL
 
-    def handle_events(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                super().check_quit_reset(event.key)
-                if event.key == pygame.K_p:
-                    self.manager.change_state(self.game_state)
-                    return
-
-    def update(self):
-        pass
-
     def render(self, window):
-        window.fill(BACKGROUND_COLOR)
+        super().render(window)
         congrats = self.font_title_message.render("CONGRATULATIONS!", 1, FONT_COLOR)
-        score_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, FONT_COLOR)
+        win_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, FONT_COLOR)
         choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
         resume = self.font.render("(P) resume game", 1, FONT_COLOR)
         restart = self.font.render("(R) restart", 1, FONT_COLOR)
         quit = self.font.render("(Q) quit", 1, FONT_COLOR)
-        start_text_height = SCREEN_HEIGHT / 2 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
+        start_text_height = 3 * SCREEN_HEIGHT / 4 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
         window.blits([
             (congrats, 
              (
                  SCREEN_WIDTH / 2 - congrats.get_width() / 2, 
-                 SCREEN_HEIGHT / 4 - (congrats.get_height() + score_message.get_height()) / 2
+                 SCREEN_HEIGHT / 4 - (congrats.get_height() + win_message.get_height()) / 2
              )
             ), 
-            (score_message,
+            (win_message,
              (
-                 SCREEN_WIDTH / 2 - score_message.get_width() / 2,
-                 SCREEN_HEIGHT / 4 - (congrats.get_height() + score_message.get_height()) / 2 + congrats.get_height()
+                 SCREEN_WIDTH / 2 - win_message.get_width() / 2,
+                 SCREEN_HEIGHT / 4 - (congrats.get_height() + win_message.get_height()) / 2 + congrats.get_height()
              )
             ),
             (choose, 
@@ -397,37 +440,51 @@ class LoseState(GameStatusState):
     def __init__(self, game_state):
         super().__init__(game_state)
 
-    def update(self):
-        pass
-
     def render(self, window):
-        window.fill(BACKGROUND_COLOR)
+        super().render(window)
         gameover = self.font_title_message.render("GAME OVER", 1, FONT_COLOR)
-        thanks = self.font.render("Thanks for playing!", 1, FONT_COLOR)
-        high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, FONT_COLOR)
-        start_text_height = SCREEN_HEIGHT / 2 - (thanks.get_height() + high_score.get_height()) / 2
+        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
+        resume = self.font.render("(P) view board", 1, FONT_COLOR)
+        restart = self.font.render("(R) restart", 1, FONT_COLOR)
+        quit = self.font.render("(Q) quit", 1, FONT_COLOR)
+        start_text_height = 3 * SCREEN_HEIGHT / 4 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
         window.blits([
             (gameover, 
              (
                  SCREEN_WIDTH / 2 - gameover.get_width() / 2, 
                  SCREEN_HEIGHT / 4 - gameover.get_height() / 2
              )),
-            (thanks, 
+            (choose, 
              (
-                 SCREEN_WIDTH / 2 - thanks.get_width() / 2,
+                 SCREEN_WIDTH / 2 - choose.get_width() / 2, 
                  start_text_height
-             ),),
-            (high_score, 
+             )
+            ), 
+            (resume,
              (
-                 SCREEN_WIDTH / 2 - high_score.get_width() / 2,
-                 start_text_height + thanks.get_height()
-             ))])
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height()
+             )
+            ), 
+            (restart,
+             (
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height() + resume.get_height()
+             )
+            ), 
+            (quit, 
+             (
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height() + resume.get_height() + restart.get_height()
+             )
+            )])
         pygame.display.update()
 
 class EndState(State):
 
     def __init__(self):
-        self.font = pygame.font.SysFont(game_font, 50, bold=True)
+        self.font = pygame.font.SysFont(game_font, 55, bold=True)
+        self.font_sub = pygame.font.SysFont(game_font, 35, bold=True)
 
     def handle_events(self, events):
         pass
@@ -438,36 +495,21 @@ class EndState(State):
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
         thanks = self.font.render("Thanks for playing!", 1, FONT_COLOR)
-        window.blit(thanks, (SCREEN_WIDTH / 2 - thanks.get_width() / 2, SCREEN_HEIGHT / 2 - thanks.get_height() / 2))
+        high_score = self.font_sub.render(f"Your high score was {self.manager.high_score}", 1, FONT_COLOR)
+        window.blits([
+            (thanks, 
+             (
+                 SCREEN_WIDTH / 2 - thanks.get_width() / 2, 
+                 SCREEN_HEIGHT / 2 - (thanks.get_height() + high_score.get_height()) / 2
+             )), 
+            (high_score, 
+             (
+                 SCREEN_WIDTH / 2 - high_score.get_width() / 2, 
+                 SCREEN_HEIGHT / 2 - (thanks.get_height() + high_score.get_height()) / 2 + thanks.get_height()
+             )
+            )])
         pygame.display.update()
-        pygame.time.wait(1000)
-
-def game_restart(window):
-
-    def draw_restart(window):
-        FONT_RESTART = pygame.font.SysFont(game_font, 50, bold=True)
-        window.fill(BACKGROUND_COLOR)
-        text = FONT_RESTART.render("What do you want the win value to be?", 1, FONT_COLOR)
-        # TODO: buttons
-        pygame.display.update()
-    
-    clock = pygame.time.Clock()
-    restart = True
-
-    win_val = 2048
-    
-    while restart:
-        clock.tick(FPS)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return GameState.QUIT, None
-            
-            # change win_val based on button clicked
-
-        draw_restart(window)
-    
-    return GameState.PLAY, Board(win_val)
+        pygame.time.wait(2000)
 
 def main():
     
@@ -478,7 +520,6 @@ def main():
 
     manager = StateManager()
 
-    game_state = GameState.INTRO
     clock = pygame.time.Clock()
     # running = True
 
@@ -738,3 +779,29 @@ def game_end(window, score):
                     return GameState.QUIT, score
     
     return GameState.QUIT, score
+
+def game_restart(window):
+
+    def draw_restart(window):
+        FONT_RESTART = pygame.font.SysFont(game_font, 50, bold=True)
+        window.fill(BACKGROUND_COLOR)
+        text = FONT_RESTART.render("What do you want the win value to be?", 1, FONT_COLOR)
+        pygame.display.update()
+    
+    clock = pygame.time.Clock()
+    restart = True
+
+    win_val = 2048
+    
+    while restart:
+        clock.tick(FPS)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.QUIT, None
+            
+            # change win_val based on button clicked
+
+        draw_restart(window)
+    
+    return GameState.PLAY, Board(win_val)
