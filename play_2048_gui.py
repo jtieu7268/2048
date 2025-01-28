@@ -182,7 +182,7 @@ class PlayState(State):
 
 class BoardState(PlayState):
 
-    def __init__(self, win_val=2048):
+    def __init__(self, win_val=32):
         self.font_tile = pygame.font.SysFont(game_font, 50, bold=True)
         self.font_score = pygame.font.SysFont(game_font, 28, bold=True)
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
@@ -218,10 +218,10 @@ class BoardState(PlayState):
                         status = self.bd.is_end(self.won)
                         if self.score > self.manager.high_score: self.manager.high_score = self.score
                         if status == GameState.END.value:
-                            self.manager.change_state(LoseState())
+                            self.manager.change_state(LoseState(self))
                         if status == GameState.WIN.value:
                             self.won = True
-                            self.manager.change_state(WinState())
+                            self.manager.change_state(WinState(self))
 
     def update(self):
         pass
@@ -309,9 +309,11 @@ class BoardState(PlayState):
 
 class GameStatusState(PlayState):
 
-    def __init__(self):
-        self.font_title_message = pygame.font.SysFont(game_font, 60, bold=True)
+    def __init__(self, game_state):
+        self.font_title_message = pygame.font.SysFont(game_font, 55, bold=True)
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
+
+        self.game_state = game_state
 
     def handle_events(self, events):
         for event in events:
@@ -326,22 +328,74 @@ class GameStatusState(PlayState):
 
 class WinState(GameStatusState):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game_state):
+        super().__init__(game_state)
+        self.win_val = game_state.bd.WIN_VAL
 
-    def handle_events(self):
-        pass
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                super().check_quit_reset(event.key)
+                if event.key == pygame.K_p:
+                    self.manager.change_state(self.game_state)
+                    return
 
     def update(self):
         pass
 
-    def render(self):
-        pass
+    def render(self, window):
+        window.fill(BACKGROUND_COLOR)
+        congrats = self.font_title_message.render("CONGRATULATIONS!", 1, FONT_COLOR)
+        score_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, FONT_COLOR)
+        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
+        resume = self.font.render("(P) resume game", 1, FONT_COLOR)
+        restart = self.font.render("(R) restart", 1, FONT_COLOR)
+        quit = self.font.render("(Q) quit", 1, FONT_COLOR)
+        start_text_height = SCREEN_HEIGHT / 2 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
+        window.blits([
+            (congrats, 
+             (
+                 SCREEN_WIDTH / 2 - congrats.get_width() / 2, 
+                 SCREEN_HEIGHT / 4 - (congrats.get_height() + score_message.get_height()) / 2
+             )
+            ), 
+            (score_message,
+             (
+                 SCREEN_WIDTH / 2 - score_message.get_width() / 2,
+                 SCREEN_HEIGHT / 4 - (congrats.get_height() + score_message.get_height()) / 2 + congrats.get_height()
+             )
+            ),
+            (choose, 
+             (
+                 SCREEN_WIDTH / 2 - choose.get_width() / 2, 
+                 start_text_height
+             )
+            ), 
+            (resume,
+             (
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height()
+             )
+            ), 
+            (restart,
+             (
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height() + resume.get_height()
+             )
+            ), 
+            (quit, 
+             (
+                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
+                 start_text_height + choose.get_height() + resume.get_height() + restart.get_height()
+             )
+            )])
+        pygame.display.update()
+
 
 class LoseState(GameStatusState):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game_state):
+        super().__init__(game_state)
 
     def update(self):
         pass
