@@ -27,7 +27,7 @@ TILE_HEIGHT = (BOARD_HEIGHT - LINE_THICKNESS * (DIM + 1)) // DIM
 
 VALUE_TO_COLOR = dict(zip([0] + [2**i for i in range(1,14)],
                         [(240,248,255),
-                        (219,235,250),
+                        (140,175,210), # (200,216,231), # (219,235,250),
                         (167,206,255),
                         (127,195,249),
                         (97,152,244),
@@ -60,15 +60,17 @@ SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
 # color constants
-BACKGROUND_COLOR = (220,230,245) # line color
+BACKGROUND_COLOR = (200,216,231) # (140, 175, 210) # (220,230,245) # line color
 FONT_COLOR = (255,255,255)
 FULL_SCREEN_COLOR = (240,248,255) # temporary empty square color
+HOVER_COLOR = (83, 118, 146) # button hover
 
 # TODO
 # buttons for win state and lose state and reset state
+# colors
+# consider animations
 # enum - clean up in board and text version (board + play_2048 get gamestate enum?)
 # clean up text version
-# colors
 # consider efficient board
 # ai
 
@@ -125,6 +127,21 @@ class ResetState(State):
     def __init__(self):
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
         self.font_sub = pygame.font.SysFont(game_font, 40, bold=True)
+        self.make_buttons()
+
+    def make_buttons(self):
+        self.buttons = []
+
+        OPTION_WIDTH = SCREEN_WIDTH // 3
+        OPTION_HEIGHT = OPTION_WIDTH // 4
+
+        for i, win_val in enumerate(WIN_VAL_OPTIONS):
+            r = i % 4
+            c = -1 if i // 4 == 0 else 1
+            x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - OPTION_WIDTH / 2
+            y = 2 * SCREEN_HEIGHT / 5 + r * (OPTION_HEIGHT + 2 * LINE_THICKNESS)
+            left = self.buttons[(i // 4) * 4].get_text_left() if r else None
+            self.buttons.append(Button((x, y, OPTION_WIDTH, OPTION_HEIGHT), f"({i+1}) {win_val}", self.font_sub, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, int(win_val), left))
 
     def handle_events(self, events):
         KEY_TO_WIN_VAL = dict(zip(
@@ -142,16 +159,21 @@ class ResetState(State):
             if event.type == pygame.KEYDOWN:
                 if event.key in KEY_TO_WIN_VAL:
                     self.manager.change_state(BoardState(int(KEY_TO_WIN_VAL[event.key])))
+            for button in self.buttons:
+                win_val = button.check_event(event)
+                if win_val:
+                    self.manager.change_state(BoardState(win_val))
     
     def update(self):
-        pass
+        for button in self.buttons:
+            button.update()
 
     def render(self, window):
 
         def draw_options():
             options = []
             for i, win_val in enumerate(WIN_VAL_OPTIONS):
-                options.append(self.font_sub.render(f"({i+1}) {win_val}", 1, FONT_COLOR))
+                options.append(self.font_sub.render(f"({i+1}) {win_val}", 1, BACKGROUND_COLOR))
             OPTION_WIDTH = options[0].get_width() + LINE_THICKNESS
             OPTION_HEIGHT = options[0].get_height() + LINE_THICKNESS
             i = 0
@@ -159,7 +181,7 @@ class ResetState(State):
                 x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - OPTION_WIDTH / 2
                 for r in range(4):
                     y = 2 * SCREEN_HEIGHT / 5 + r * (OPTION_HEIGHT + 2 * LINE_THICKNESS)
-                    pygame.draw.rect(window, BACKGROUND_COLOR, (x, y, OPTION_WIDTH, OPTION_HEIGHT), border_radius=OPTION_HEIGHT // 10)
+                    pygame.draw.rect(window, FULL_SCREEN_COLOR, (x, y, OPTION_WIDTH, OPTION_HEIGHT), border_radius=OPTION_HEIGHT // 20)
                     window.blit(options[i], 
                                 (
                                     x + OPTION_WIDTH / 2 - options[0].get_width() / 2, 
@@ -167,10 +189,12 @@ class ResetState(State):
                                 ))
                     i += 1
                     
-        window.fill(FULL_SCREEN_COLOR)
+        window.fill(BACKGROUND_COLOR)
         select_value = self.font.render("Enter a number to select a win value.", 1, FONT_COLOR)
         window.blit(select_value, (SCREEN_WIDTH / 2 - select_value.get_width() / 2, SCREEN_HEIGHT / 4 - select_value.get_height() / 2))
-        draw_options()
+        # draw_options()
+        for button in self.buttons:
+            button.render(window)
         pygame.display.update()
 
 class PlayState(State):
@@ -484,6 +508,52 @@ class EndState(State):
             )])
         pygame.display.update()
         pygame.time.wait(2000)
+
+class Button:
+
+    def __init__(self, rect: tuple[int,int,int,int], text: str, font: pygame.font.Font, font_color: tuple[int,int,int], button_color: tuple[int,int,int], button_hover_color: tuple[int,int,int], click_action: int, subsequent_button: int=0):
+        self.rect = pygame.Rect(rect)
+        self.font = font
+        self.font_color = font_color
+        self.text = self.font.render(text, 1, self.font_color)
+        self.curr_color = self.button_color = button_color
+        self.button_hover_color = button_hover_color
+        self.click_action = click_action
+        self.clicked = False
+        self.hovered = False
+        self.subsequent_button = subsequent_button
+
+    def check_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.clicked = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            self.clicked = False
+            return self.click_action
+        return 0
+
+    def check_hover(self):
+        if self.rect.collidepoint(pygame.mouse.get_pos()) and not self.hovered:
+            self.hovered = True
+        elif not self.rect.collidepoint(pygame.mouse.get_pos()) and self.hovered:
+            self.hovered = False
+
+    def update(self):
+        self.curr_color = self.button_color
+        self.check_hover()
+        if self.hovered:
+            self.curr_color = self.button_hover_color
+        
+
+    def render(self, window):
+        pygame.draw.rect(window, self.curr_color, self.rect, border_radius=self.rect.width // 10)
+        if not self.subsequent_button:
+            text_rect = self.text.get_rect(center=self.rect.center)
+        else:
+            text_rect = self.text.get_rect(left=self.subsequent_button, centery=self.rect.centery)
+        window.blit(self.text, text_rect)
+
+    def get_text_left(self):
+        return self.text.get_rect(center=self.rect.center).left
 
 def main():
     
