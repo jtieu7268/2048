@@ -64,37 +64,11 @@ BACKGROUND_COLOR = (220,230,245) # line color
 FONT_COLOR = (255,255,255)
 FULL_SCREEN_COLOR = (240,248,255) # temporary empty square color
 
-""" game states
-- main: controls game state and pages, initiates pygame stuff
-- intro: title page
-- play: game loop
-- win: player has won
-- end: player has lost
-- quit: player quits
-
-intro: introduces game, gives option to select win val -> play
-play: game loop, 
-    needs score, high score,
-    if player has won, give message with option to continue playing or quit -> win, 
-    if game is over, take to end screen -> end
-win: player has won, give message
-    continue play -> play
-    quit -> end
-end: game was played and ended, give message
-    if won, congratulations
-    everyone gets high score and thanks for playing
-    -> quit
-quit: result from player quitting
-
-board + play_2048 get gamestate enum?
-
-"""
-
-# win state
-# buttons for win state and lose state
-# reset state
-# enum - clean up in board and text version
+# TODO
+# buttons for win state and lose state and reset state
+# enum - clean up in board and text version (board + play_2048 get gamestate enum?)
 # clean up text version
+# colors
 # consider efficient board
 # ai
 
