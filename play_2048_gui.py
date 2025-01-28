@@ -168,31 +168,10 @@ class ResetState(State):
         for button in self.buttons:
             button.update()
 
-    def render(self, window):
-
-        def draw_options():
-            options = []
-            for i, win_val in enumerate(WIN_VAL_OPTIONS):
-                options.append(self.font_sub.render(f"({i+1}) {win_val}", 1, BACKGROUND_COLOR))
-            OPTION_WIDTH = options[0].get_width() + LINE_THICKNESS
-            OPTION_HEIGHT = options[0].get_height() + LINE_THICKNESS
-            i = 0
-            for c in [-1, 1]:
-                x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - OPTION_WIDTH / 2
-                for r in range(4):
-                    y = 2 * SCREEN_HEIGHT / 5 + r * (OPTION_HEIGHT + 2 * LINE_THICKNESS)
-                    pygame.draw.rect(window, FULL_SCREEN_COLOR, (x, y, OPTION_WIDTH, OPTION_HEIGHT), border_radius=OPTION_HEIGHT // 20)
-                    window.blit(options[i], 
-                                (
-                                    x + OPTION_WIDTH / 2 - options[0].get_width() / 2, 
-                                    y + OPTION_HEIGHT / 2 - options[0].get_height() / 2
-                                ))
-                    i += 1
-                    
+    def render(self, window):                    
         window.fill(BACKGROUND_COLOR)
         select_value = self.font.render("Enter a number to select a win value.", 1, FONT_COLOR)
         window.blit(select_value, (SCREEN_WIDTH / 2 - select_value.get_width() / 2, SCREEN_HEIGHT / 4 - select_value.get_height() / 2))
-        # draw_options()
         for button in self.buttons:
             button.render(window)
         pygame.display.update()
@@ -524,9 +503,9 @@ class Button:
         self.subsequent_button = subsequent_button
 
     def check_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rect.collidepoint(event.pos):
             self.clicked = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1 and self.clicked:
             self.clicked = False
             return self.click_action
         return 0
