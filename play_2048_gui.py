@@ -124,6 +124,9 @@ class IntroState(State):
 
 class ResetState(State):
 
+    OPTION_WIDTH = SCREEN_WIDTH // 3
+    OPTION_HEIGHT = OPTION_WIDTH // 4
+
     def __init__(self):
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
         self.font_sub = pygame.font.SysFont(game_font, 40, bold=True)
@@ -132,16 +135,13 @@ class ResetState(State):
     def make_buttons(self):
         self.buttons = []
 
-        OPTION_WIDTH = SCREEN_WIDTH // 3
-        OPTION_HEIGHT = OPTION_WIDTH // 4
-
         for i, win_val in enumerate(WIN_VAL_OPTIONS):
             r = i % 4
             c = -1 if i // 4 == 0 else 1
-            x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - OPTION_WIDTH / 2
-            y = 2 * SCREEN_HEIGHT / 5 + r * (OPTION_HEIGHT + 2 * LINE_THICKNESS)
+            x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - self.OPTION_WIDTH / 2
+            y = 2 * SCREEN_HEIGHT / 5 + r * (self.OPTION_HEIGHT + 2 * LINE_THICKNESS)
             left = self.buttons[(i // 4) * 4].get_text_left() if r else None
-            self.buttons.append(Button((x, y, OPTION_WIDTH, OPTION_HEIGHT), f"({i+1}) {win_val}", self.font_sub, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, int(win_val), left))
+            self.buttons.append(Button((x, y, self.OPTION_WIDTH, self.OPTION_HEIGHT), f"({i+1}) {win_val}", self.font_sub, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, int(win_val), left))
 
     def handle_events(self, events):
         KEY_TO_WIN_VAL = dict(zip(
@@ -325,11 +325,22 @@ class BoardState(PlayState):
 
 class GameStatusState(PlayState):
 
+    OPTION_WIDTH = SCREEN_WIDTH // 2
+    OPTION_HEIGHT = OPTION_WIDTH // 6
+
     def __init__(self, game_state):
         self.font_title_message = pygame.font.SysFont(game_font, 55, bold=True)
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
 
         self.game_state = game_state
+        self.options = ["(P) ", "(R) restart", "(Q) quit"]
+        self.states = [GameState.PLAY, GameState.RESTART, GameState.QUIT]
+        self.buttons = []
+        self.start_text_height = 3 * SCREEN_HEIGHT / 4 - (len(self.options) * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT) / 2
+
+    def make_buttons(self):
+        for i, option in enumerate(self.options):
+            self.buttons.append(Button((SCREEN_WIDTH / 2 - self.OPTION_WIDTH / 2, self.start_text_height + i * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT, self.OPTION_WIDTH, self.OPTION_HEIGHT), option, self.font, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, self.states[i]))
 
     def handle_events(self, events):
         for event in events:
@@ -338,12 +349,25 @@ class GameStatusState(PlayState):
                 if event.key == pygame.K_p:
                     self.manager.change_state(self.game_state)
                     return
+            for button in self.buttons:
+                next_state = button.check_event(event)
+                if next_state == GameState.PLAY:
+                    self.manager.change_state(self.game_state)
+                elif next_state == GameState.RESTART:
+                    self.manager.change_state(ResetState())
+                elif next_state == GameState.QUIT:
+                    self.manager.change_state(EndState())
+
+    def update(self):
+        for button in self.buttons:
+            button.update()
 
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
         score = self.font.render(f"Score: {self.game_state.score}", 1, FONT_COLOR)
         high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, FONT_COLOR)
         start_text_height = SCREEN_HEIGHT / 2 - (score.get_height() + high_score.get_height()) / 2
+        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
         window.blits([
             (score, 
              (
@@ -355,23 +379,28 @@ class GameStatusState(PlayState):
                  SCREEN_WIDTH / 2 - high_score.get_width() / 2, 
                  start_text_height + score.get_height()
              )
+            ),
+            (choose, 
+             (
+                 SCREEN_WIDTH / 2 - choose.get_width() / 2, 
+                 self.start_text_height
+             )
             )])
+        for button in self.buttons:
+            button.render(window)
 
 class WinState(GameStatusState):
 
     def __init__(self, game_state):
         super().__init__(game_state)
         self.win_val = game_state.bd.WIN_VAL
+        self.options[0] += "resume game"
+        self.make_buttons()
 
     def render(self, window):
         super().render(window)
         congrats = self.font_title_message.render("CONGRATULATIONS!", 1, FONT_COLOR)
         win_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, FONT_COLOR)
-        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
-        resume = self.font.render("(P) resume game", 1, FONT_COLOR)
-        restart = self.font.render("(R) restart", 1, FONT_COLOR)
-        quit = self.font.render("(Q) quit", 1, FONT_COLOR)
-        start_text_height = 3 * SCREEN_HEIGHT / 4 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
         window.blits([
             (congrats, 
              (
@@ -383,30 +412,6 @@ class WinState(GameStatusState):
              (
                  SCREEN_WIDTH / 2 - win_message.get_width() / 2,
                  SCREEN_HEIGHT / 4 - (congrats.get_height() + win_message.get_height()) / 2 + congrats.get_height()
-             )
-            ),
-            (choose, 
-             (
-                 SCREEN_WIDTH / 2 - choose.get_width() / 2, 
-                 start_text_height
-             )
-            ), 
-            (resume,
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height()
-             )
-            ), 
-            (restart,
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height() + resume.get_height()
-             )
-            ), 
-            (quit, 
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height() + resume.get_height() + restart.get_height()
              )
             )])
         pygame.display.update()
