@@ -8,6 +8,28 @@ SCREEN_HEIGHT = 800
 FPS = 60
 game_font = "Arial"
 
+# color constants
+TILE_2_COLOR = (190, 212, 233)
+TILE_4_COLOR = (103, 153, 203)
+TILE_8_COLOR = (153, 153, 204)
+TILE_16_COLOR = (103, 104, 171)
+TILE_32_COLOR = (88, 108, 156) 
+TILE_64_COLOR = (220, 181, 201)
+TILE_128_COLOR = (195, 131, 152)
+TILE_256_COLOR = (206, 128, 167)
+TILE_512_COLOR = (82, 125, 115)
+TILE_1024_COLOR = (94, 141, 131)
+TILE_2048_COLOR = (95, 119, 141)
+TILE_4096_COLOR = (136, 136, 183)
+TILE_8192_COLOR = (213, 188, 213)
+
+TILE_FONT_COLOR = (255,255,255)
+EMPTY_TILE_COLOR = BACKGROUND_COLOR = (231, 241, 251)
+TEXT_FONT_COLOR = GRID_LINE_COLOR = (81, 102, 121)
+BUTTON_COLOR = TILE_2_COLOR
+BUTTON_HOVER_COLOR = GRID_LINE_COLOR
+BUTTON_TEXT_COLOR = TILE_FONT_COLOR
+
 # header and score related constants
 HEADER_WIDTH = SCREEN_WIDTH
 HEADER_HEIGHT = SCREEN_HEIGHT // 8
@@ -26,18 +48,20 @@ TILE_WIDTH = (BOARD_WIDTH - LINE_THICKNESS * (DIM + 1)) // DIM
 TILE_HEIGHT = (BOARD_HEIGHT - LINE_THICKNESS * (DIM + 1)) // DIM
 
 VALUE_TO_COLOR = dict(zip([0] + [2**i for i in range(1,14)],
-                        [(240,248,255),
-                        (140,175,210), # (200,216,231), # (219,235,250),
-                        (167,206,255),
-                        (127,195,249),
-                        (97,152,244),
-                        (59,101,251),
-                        (41,130,255),
-                        (210,193,246),
-                        (222,164,255),
-                        (165,151,251),
-                        (109,105,255),
-                        (178,80,255)]))
+                        [EMPTY_TILE_COLOR,
+                        TILE_2_COLOR,
+                        TILE_4_COLOR,
+                        TILE_8_COLOR,
+                        TILE_16_COLOR,
+                        TILE_32_COLOR,
+                        TILE_64_COLOR,
+                        TILE_128_COLOR,
+                        TILE_256_COLOR,
+                        TILE_512_COLOR,
+                        TILE_1024_COLOR,
+                        TILE_2048_COLOR, 
+                        TILE_4096_COLOR, 
+                        TILE_8192_COLOR]))
 
 # game related constants
 class GameState(Enum):
@@ -59,18 +83,11 @@ WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128", "64", "32", "16")
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
-# color constants
-BACKGROUND_COLOR = (200,216,231) # (140, 175, 210) # (220,230,245) # line color
-FONT_COLOR = (255,255,255)
-FULL_SCREEN_COLOR = (240,248,255) # temporary empty square color
-HOVER_COLOR = (83, 118, 146) # button hover
-
 # TODO
-# buttons for win state and lose state and reset state
-# colors
-# consider animations
+# clean up gui code
 # enum - clean up in board and text version (board + play_2048 get gamestate enum?)
 # clean up text version
+# consider animations
 # consider efficient board
 # ai
 
@@ -115,8 +132,8 @@ class IntroState(State):
 
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
-        welcome = self.font.render("Welcome of 2048!", 1, FONT_COLOR)
-        cont = self.font_sub.render("Press any key or click to continue", 1, FONT_COLOR)
+        welcome = self.font.render("Welcome of 2048!", 1, TEXT_FONT_COLOR)
+        cont = self.font_sub.render("Press any key or click to continue", 1, TEXT_FONT_COLOR)
         start_text_height = SCREEN_HEIGHT / 3 - (welcome.get_height() + cont.get_height()) / 2
         window.blits([(welcome, (SCREEN_WIDTH / 2 - welcome.get_width() / 2, start_text_height)),
                       (cont, (SCREEN_WIDTH / 2 - cont.get_width() / 2, SCREEN_HEIGHT / 2 - cont.get_height() / 2))])
@@ -141,7 +158,7 @@ class ResetState(State):
             x = SCREEN_WIDTH / 2 + c * SCREEN_WIDTH / 5 - self.OPTION_WIDTH / 2
             y = 2 * SCREEN_HEIGHT / 5 + r * (self.OPTION_HEIGHT + 2 * LINE_THICKNESS)
             left = self.buttons[(i // 4) * 4].get_text_left() if r else None
-            self.buttons.append(Button((x, y, self.OPTION_WIDTH, self.OPTION_HEIGHT), f"({i+1}) {win_val}", self.font_sub, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, int(win_val), left))
+            self.buttons.append(Button((x, y, self.OPTION_WIDTH, self.OPTION_HEIGHT), f"({i+1}) {win_val}", self.font_sub, BUTTON_TEXT_COLOR, BUTTON_COLOR, BUTTON_HOVER_COLOR, int(win_val), left))
 
     def handle_events(self, events):
         KEY_TO_WIN_VAL = dict(zip(
@@ -170,7 +187,7 @@ class ResetState(State):
 
     def render(self, window):                    
         window.fill(BACKGROUND_COLOR)
-        select_value = self.font.render("Enter a number to select a win value.", 1, FONT_COLOR)
+        select_value = self.font.render("Enter a number to select a win value.", 1, TEXT_FONT_COLOR)
         window.blit(select_value, (SCREEN_WIDTH / 2 - select_value.get_width() / 2, SCREEN_HEIGHT / 4 - select_value.get_height() / 2))
         for button in self.buttons:
             button.render(window)
@@ -251,7 +268,7 @@ class BoardState(PlayState):
                 color = VALUE_TO_COLOR[tile]
                 pygame.draw.rect(window, color, (x, y, TILE_WIDTH, TILE_HEIGHT), border_radius=TILE_WIDTH // 10)
                 tile_text = str(tile) if tile else ""
-                text = self.font_tile.render(tile_text, 1, FONT_COLOR)
+                text = self.font_tile.render(tile_text, 1, TILE_FONT_COLOR)
                 window.blit(text,
                             (
                                 x + TILE_WIDTH / 2 - text.get_width() / 2,
@@ -263,19 +280,19 @@ class BoardState(PlayState):
 
         def draw_header():
             pygame.draw.rect(window, 
-                             FULL_SCREEN_COLOR, 
+                             EMPTY_TILE_COLOR, 
                              (LINE_THICKNESS, LINE_THICKNESS, SCORE_BOX_WIDTH, SCORE_BOX_HEIGHT), 
                              border_radius=SCORE_BOX_HEIGHT // 10
                             )
             pygame.draw.rect(window, 
-                             FULL_SCREEN_COLOR, 
+                             EMPTY_TILE_COLOR, 
                              (2 * LINE_THICKNESS + SCORE_BOX_WIDTH, LINE_THICKNESS, SCORE_BOX_WIDTH, SCORE_BOX_HEIGHT), 
                              border_radius=SCORE_BOX_HEIGHT // 10
                             )
-            score_header = self.font.render("SCORE", 1, BACKGROUND_COLOR)
-            score_text = self.font_score.render(str(self.score), 1, BACKGROUND_COLOR)
-            high_score_header = self.font.render("HIGH SCORE", 1, BACKGROUND_COLOR)
-            high_score_text = self.font_score.render(str(self.manager.high_score), 1, BACKGROUND_COLOR)
+            score_header = self.font.render("SCORE", 1, TEXT_FONT_COLOR)
+            score_text = self.font_score.render(str(self.score), 1, TEXT_FONT_COLOR)
+            high_score_header = self.font.render("HIGH SCORE", 1, TEXT_FONT_COLOR)
+            high_score_text = self.font_score.render(str(self.manager.high_score), 1, TEXT_FONT_COLOR)
             window.blits([
                 (score_header, 
                  (
@@ -300,11 +317,11 @@ class BoardState(PlayState):
         
         def draw_footer():
             pygame.draw.rect(window, 
-                            FULL_SCREEN_COLOR, 
+                            EMPTY_TILE_COLOR, 
                             (LINE_THICKNESS, SCREEN_HEIGHT - FOOTER_HEIGHT, FOOTER_WIDTH - 2 * LINE_THICKNESS, FOOTER_HEIGHT - LINE_THICKNESS),
                             border_radius=FOOTER_HEIGHT // 10)
-            instructions = self.font.render("Use arrow keys or WASD to slide tiles", 1, BACKGROUND_COLOR)
-            options = self.font.render("R - RESTART    Q - QUIT", 1, BACKGROUND_COLOR)
+            instructions = self.font.render("Use arrow keys or WASD to slide tiles", 1, TEXT_FONT_COLOR)
+            options = self.font.render("R - RESTART    Q - QUIT", 1, TEXT_FONT_COLOR)
             window.blits([
                 (instructions, 
                  (
@@ -317,7 +334,7 @@ class BoardState(PlayState):
                      SCREEN_HEIGHT - FOOTER_HEIGHT / 3 - options.get_height() / 2
                  ))])
         
-        window.fill(BACKGROUND_COLOR)
+        window.fill(GRID_LINE_COLOR)
         draw_tiles()
         draw_header()
         draw_footer()
@@ -333,14 +350,14 @@ class GameStatusState(PlayState):
         self.font = pygame.font.SysFont(game_font, 30, bold=True)
 
         self.game_state = game_state
-        self.options = ["(P) ", "(R) restart", "(Q) quit"]
+        self.options = ["(P) ", "(R) RESTART", "(Q) QUIT"]
         self.states = [GameState.PLAY, GameState.RESTART, GameState.QUIT]
         self.buttons = []
         self.start_text_height = 3 * SCREEN_HEIGHT / 4 - (len(self.options) * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT) / 2
 
     def make_buttons(self):
         for i, option in enumerate(self.options):
-            self.buttons.append(Button((SCREEN_WIDTH / 2 - self.OPTION_WIDTH / 2, self.start_text_height + i * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT, self.OPTION_WIDTH, self.OPTION_HEIGHT), option, self.font, BACKGROUND_COLOR, FULL_SCREEN_COLOR, HOVER_COLOR, self.states[i]))
+            self.buttons.append(Button((SCREEN_WIDTH / 2 - self.OPTION_WIDTH / 2, self.start_text_height + i * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT, self.OPTION_WIDTH, self.OPTION_HEIGHT), option, self.font, BUTTON_TEXT_COLOR, BUTTON_COLOR, BUTTON_HOVER_COLOR, self.states[i]))
 
     def handle_events(self, events):
         for event in events:
@@ -364,10 +381,10 @@ class GameStatusState(PlayState):
 
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
-        score = self.font.render(f"Score: {self.game_state.score}", 1, FONT_COLOR)
-        high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, FONT_COLOR)
+        score = self.font.render(f"Score: {self.game_state.score}", 1, TEXT_FONT_COLOR)
+        high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, TEXT_FONT_COLOR)
         start_text_height = SCREEN_HEIGHT / 2 - (score.get_height() + high_score.get_height()) / 2
-        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
+        choose = self.font.render("Select one of the following:", 1, TEXT_FONT_COLOR)
         window.blits([
             (score, 
              (
@@ -394,13 +411,13 @@ class WinState(GameStatusState):
     def __init__(self, game_state):
         super().__init__(game_state)
         self.win_val = game_state.bd.WIN_VAL
-        self.options[0] += "resume game"
+        self.options[0] += "RESUME GAME"
         self.make_buttons()
 
     def render(self, window):
         super().render(window)
-        congrats = self.font_title_message.render("CONGRATULATIONS!", 1, FONT_COLOR)
-        win_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, FONT_COLOR)
+        congrats = self.font_title_message.render("CONGRATULATIONS!", 1, TEXT_FONT_COLOR)
+        win_message = self.font_title_message.render(f"YOU GOT {self.win_val}", 1, TEXT_FONT_COLOR)
         window.blits([
             (congrats, 
              (
@@ -421,43 +438,17 @@ class LoseState(GameStatusState):
 
     def __init__(self, game_state):
         super().__init__(game_state)
+        self.options[0] += "VIEW BOARD"
+        self.make_buttons()
 
     def render(self, window):
         super().render(window)
-        gameover = self.font_title_message.render("GAME OVER", 1, FONT_COLOR)
-        choose = self.font.render("Select one of the following:", 1, FONT_COLOR)
-        resume = self.font.render("(P) view board", 1, FONT_COLOR)
-        restart = self.font.render("(R) restart", 1, FONT_COLOR)
-        quit = self.font.render("(Q) quit", 1, FONT_COLOR)
-        start_text_height = 3 * SCREEN_HEIGHT / 4 - (choose.get_height() + resume.get_height() + restart.get_height()+ quit.get_height()) / 2
+        gameover = self.font_title_message.render("GAME OVER", 1, TEXT_FONT_COLOR)
         window.blits([
             (gameover, 
              (
                  SCREEN_WIDTH / 2 - gameover.get_width() / 2, 
                  SCREEN_HEIGHT / 4 - gameover.get_height() / 2
-             )),
-            (choose, 
-             (
-                 SCREEN_WIDTH / 2 - choose.get_width() / 2, 
-                 start_text_height
-             )
-            ), 
-            (resume,
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height()
-             )
-            ), 
-            (restart,
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height() + resume.get_height()
-             )
-            ), 
-            (quit, 
-             (
-                 SCREEN_WIDTH / 2 - resume.get_width() / 2, 
-                 start_text_height + choose.get_height() + resume.get_height() + restart.get_height()
              )
             )])
         pygame.display.update()
@@ -476,8 +467,8 @@ class EndState(State):
 
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
-        thanks = self.font.render("Thanks for playing!", 1, FONT_COLOR)
-        high_score = self.font_sub.render(f"Your high score was {self.manager.high_score}", 1, FONT_COLOR)
+        thanks = self.font.render("Thanks for playing!", 1, TEXT_FONT_COLOR)
+        high_score = self.font_sub.render(f"Your high score was {self.manager.high_score}", 1, TEXT_FONT_COLOR)
         window.blits([
             (thanks, 
              (
@@ -529,7 +520,7 @@ class Button:
         
 
     def render(self, window):
-        pygame.draw.rect(window, self.curr_color, self.rect, border_radius=self.rect.width // 10)
+        pygame.draw.rect(window, self.curr_color, self.rect, border_radius=self.rect.height // 5)
         if not self.subsequent_button:
             text_rect = self.text.get_rect(center=self.rect.center)
         else:
