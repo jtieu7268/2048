@@ -1,5 +1,5 @@
 import unittest
-from board import Board
+from board import Board, BoardStatus, Move
 import play_2048
 
 class test_board_init(unittest.TestCase):
@@ -34,21 +34,21 @@ class test_board_move(unittest.TestCase):
         bd = Board()
         reset_board(bd)
         bd.tiles[0][0] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c0_0020(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[2][0] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c1_0004(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[3][1] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c0_0240(self):
@@ -56,7 +56,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c0_0204(self):
@@ -64,7 +64,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[3][0] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
     
     def test_move_up_c0_2004(self):
@@ -72,7 +72,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 2
         bd.tiles[3][0] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[2,0,0,0],[4,0,0,0],[0,0,0,0],[0,0,0,0]])
    
     def test_move_up_c0_0220_merge(self):
@@ -80,7 +80,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
     
     def test_move_up_c0_0202_merge(self):
@@ -88,7 +88,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[3][0] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c0_0404_merge(self):
@@ -96,7 +96,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 4
         bd.tiles[3][0] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[8,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c3_0404_merge(self):
@@ -104,7 +104,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][3] = 4
         bd.tiles[3][3] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,0,8],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c2_2420(self):
@@ -113,7 +113,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[0][2] = 2
         bd.tiles[1][2] = 4
         bd.tiles[2][2] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,2,0],[0,0,4,0],[0,0,2,0],[0,0,0,0]])
 
     def test_move_up_c2_2220_merge(self):
@@ -122,7 +122,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[0][2] = 2
         bd.tiles[1][2] = 2
         bd.tiles[2][2] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,2,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c2_0222_merge(self):
@@ -131,7 +131,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[1][2] = 2
         bd.tiles[2][2] = 2
         bd.tiles[3][2] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,2,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c2_2222_merge(self):
@@ -141,7 +141,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[1][2] = 2
         bd.tiles[2][2] = 2
         bd.tiles[3][2] = 2
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,4,0],[0,0,4,0],[0,0,0,0],[0,0,0,0]])
     
     def test_move_up_c2_4444_merge(self):
@@ -151,7 +151,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[1][2] = 4
         bd.tiles[2][2] = 4
         bd.tiles[3][2] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,8,0],[0,0,8,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_up_c2_8844_merge(self):
@@ -161,28 +161,28 @@ class test_board_move(unittest.TestCase):
         bd.tiles[1][2] = 8
         bd.tiles[2][2] = 4
         bd.tiles[3][2] = 4
-        bd.move("U")
+        bd.move(Move.UP)
         self.assertEqual(bd.tiles,[[0,0,16,0],[0,0,8,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_lt_r0_2000(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[0][0] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[2,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_lt_r2_0020(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[2][0] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[2,0,0,0],[0,0,0,0]])
 
     def test_move_lt_r3_0004(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[3][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,0,0],[4,0,0,0]])
 
     def test_move_lt_r0_0240(self):
@@ -190,7 +190,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][1] = 2
         bd.tiles[0][2] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[2,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_lt_r0_0204(self):
@@ -198,7 +198,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][1] = 2
         bd.tiles[0][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[2,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
     
     def test_move_lt_r0_2004(self):
@@ -206,7 +206,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 2
         bd.tiles[0][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[2,4,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
    
     def test_move_lt_r0_0220_merge(self):
@@ -214,7 +214,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][1] = 2
         bd.tiles[0][2] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
     
     def test_move_lt_r0_0202_merge(self):
@@ -222,7 +222,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][1] = 2
         bd.tiles[0][3] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[4,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_lt_c0_0404_merge(self):
@@ -230,7 +230,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][1] = 4
         bd.tiles[0][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[8,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_lt_r3_0404_merge(self):
@@ -238,7 +238,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[3][1] = 4
         bd.tiles[3][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,0,0],[8,0,0,0]])
 
     def test_move_lt_r2_2420(self):
@@ -247,7 +247,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][0] = 2
         bd.tiles[2][1] = 4
         bd.tiles[2][2] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[2,4,2,0],[0,0,0,0]])
 
     def test_move_lt_r2_2220_merge(self):
@@ -256,7 +256,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][0] = 2
         bd.tiles[2][1] = 2
         bd.tiles[2][2] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[4,2,0,0],[0,0,0,0]])
 
     def test_move_lt_r2_0222_merge(self):
@@ -265,7 +265,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][1] = 2
         bd.tiles[2][2] = 2
         bd.tiles[2][3] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[4,2,0,0],[0,0,0,0]])
 
     def test_move_lt_r2_2222_merge(self):
@@ -275,7 +275,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][1] = 2
         bd.tiles[2][2] = 2
         bd.tiles[2][3] = 2
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[4,4,0,0],[0,0,0,0]])
     
     def test_move_lt_r2_4444_merge(self):
@@ -285,7 +285,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][1] = 4
         bd.tiles[2][2] = 4
         bd.tiles[2][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[8,8,0,0],[0,0,0,0]])
 
     def test_move_lt_r2_8844_merge(self):
@@ -295,14 +295,14 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][1] = 8
         bd.tiles[2][2] = 4
         bd.tiles[2][3] = 4
-        bd.move("L")
+        bd.move(Move.LEFT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[16,8,0,0],[0,0,0,0]])
 
     def test_move_rt_r0_2000(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[0][0] = 2
-        bd.move("R")
+        bd.move(Move.RIGHT)
         self.assertEqual(bd.tiles,[[0,0,0,2],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_rt_r0_2040(self):
@@ -310,7 +310,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 2
         bd.tiles[0][2] = 4
-        bd.move("R")
+        bd.move(Move.RIGHT)
         self.assertEqual(bd.tiles,[[0,0,2,4],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_rt_r0_4040_merge(self):
@@ -318,7 +318,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 4
         bd.tiles[0][2] = 4
-        bd.move("R")
+        bd.move(Move.RIGHT)
         self.assertEqual(bd.tiles,[[0,0,0,8],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 
     def test_move_rt_r0_4440_merge(self):
@@ -327,7 +327,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[0][0] = 4
         bd.tiles[0][1] = 4
         bd.tiles[0][2] = 4
-        bd.move("R")
+        bd.move(Move.RIGHT)
         self.assertEqual(bd.tiles,[[0,0,4,8],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
         
     def test_move_rt_r2_4444_merge(self):
@@ -337,14 +337,14 @@ class test_board_move(unittest.TestCase):
         bd.tiles[2][1] = 4
         bd.tiles[2][2] = 4
         bd.tiles[2][3] = 4
-        bd.move("R")
+        bd.move(Move.RIGHT)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,8,8],[0,0,0,0]])
 
     def test_move_dn_c0_2000(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[0][0] = 2
-        bd.move("D")
+        bd.move(Move.DOWN)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,0,0],[2,0,0,0]])
 
     def test_move_dn_c0_2040(self):
@@ -352,7 +352,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 2
         bd.tiles[2][0] = 4
-        bd.move("D")
+        bd.move(Move.DOWN)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[2,0,0,0],[4,0,0,0]])
 
     def test_move_dn_c0_4040_merge(self):
@@ -360,7 +360,7 @@ class test_board_move(unittest.TestCase):
         reset_board(bd)
         bd.tiles[0][0] = 4
         bd.tiles[2][0] = 4
-        bd.move("D")
+        bd.move(Move.DOWN)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,0,0],[8,0,0,0]])
 
     def test_move_dn_c0_4440_merge(self):
@@ -369,7 +369,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[0][0] = 4
         bd.tiles[1][0] = 4
         bd.tiles[2][0] = 4
-        bd.move("D")
+        bd.move(Move.DOWN)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[4,0,0,0],[8,0,0,0]])
         
     def test_move_dn_c2_4444_merge(self):
@@ -379,7 +379,7 @@ class test_board_move(unittest.TestCase):
         bd.tiles[1][2] = 4
         bd.tiles[2][2] = 4
         bd.tiles[3][2] = 4
-        bd.move("D")
+        bd.move(Move.DOWN)
         self.assertEqual(bd.tiles,[[0,0,0,0],[0,0,0,0],[0,0,8,0],[0,0,8,0]])
 
 class test_board_move_score(unittest.TestCase):
@@ -389,56 +389,56 @@ class test_board_move_score(unittest.TestCase):
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][2] = 2
-        self.assertEqual(bd.move("U"),0)
+        self.assertEqual(bd.move(Move.UP),0)
 
     def test_score_merge_0_rt(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][2] = 2
-        self.assertEqual(bd.move("R"),0)
+        self.assertEqual(bd.move(Move.RIGHT),0)
 
     def test_score_merge_0_dn(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][2] = 2
-        self.assertEqual(bd.move("D"),0)
+        self.assertEqual(bd.move(Move.DOWN),0)
 
     def test_score_merge_0_lt(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][2] = 2
-        self.assertEqual(bd.move("L"),0)
+        self.assertEqual(bd.move(Move.LEFT),0)
     
     def test_score_merge_1_up(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 2
-        self.assertEqual(bd.move("U"),4)
+        self.assertEqual(bd.move(Move.UP),4)
 
     def test_score_merge_1_rt(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 4
         bd.tiles[1][2] = 4
-        self.assertEqual(bd.move("R"),8)
+        self.assertEqual(bd.move(Move.RIGHT),8)
 
     def test_score_merge_1_dn(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 2
-        self.assertEqual(bd.move("D"),4)
+        self.assertEqual(bd.move(Move.DOWN),4)
 
     def test_score_merge_1_lt(self):
         bd = Board()
         reset_board(bd)
         bd.tiles[1][0] = 4
         bd.tiles[1][2] = 4
-        self.assertEqual(bd.move("L"),8)
+        self.assertEqual(bd.move(Move.LEFT),8)
 
     def test_score_merge_2_up_diff_vector(self):
         bd = Board()
@@ -447,7 +447,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[1][0] = 2
         bd.tiles[0][3] = 4
         bd.tiles[1][3] = 4
-        self.assertEqual(bd.move("U"),12)
+        self.assertEqual(bd.move(Move.UP),12)
     
     def test_score_merge_2_up_same_vector(self):
         bd = Board()
@@ -456,7 +456,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 4
         bd.tiles[3][0] = 4
-        self.assertEqual(bd.move("U"),12)
+        self.assertEqual(bd.move(Move.UP),12)
 
     def test_score_merge_2_rt_diff_vector(self):
         bd = Board()
@@ -465,7 +465,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[0][1] = 16
         bd.tiles[3][0] = 64
         bd.tiles[3][1] = 64
-        self.assertEqual(bd.move("R"),160)
+        self.assertEqual(bd.move(Move.RIGHT),160)
 
     def test_score_merge_2_rt_same_vector(self):
         bd = Board()
@@ -474,7 +474,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[3][1] = 16
         bd.tiles[3][2] = 64
         bd.tiles[3][3] = 64
-        self.assertEqual(bd.move("R"),160)
+        self.assertEqual(bd.move(Move.RIGHT),160)
 
     def test_score_merge_2_dn_diff_vector(self):
         bd = Board()
@@ -483,7 +483,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[1][0] = 2
         bd.tiles[0][3] = 4
         bd.tiles[1][3] = 4
-        self.assertEqual(bd.move("D"),12)
+        self.assertEqual(bd.move(Move.DOWN),12)
     
     def test_score_merge_2_dn_same_vector(self):
         bd = Board()
@@ -492,7 +492,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[1][0] = 2
         bd.tiles[2][0] = 4
         bd.tiles[3][0] = 4
-        self.assertEqual(bd.move("D"),12)
+        self.assertEqual(bd.move(Move.DOWN),12)
 
     def test_score_merge_2_lt_diff_vector(self):
         bd = Board()
@@ -501,7 +501,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[0][1] = 16
         bd.tiles[3][0] = 64
         bd.tiles[3][1] = 64
-        self.assertEqual(bd.move("L"),160)
+        self.assertEqual(bd.move(Move.LEFT),160)
 
     def test_score_merge_2_lt_same_vector(self):
         bd = Board()
@@ -510,7 +510,7 @@ class test_board_move_score(unittest.TestCase):
         bd.tiles[3][1] = 16
         bd.tiles[3][2] = 64
         bd.tiles[3][3] = 64
-        self.assertEqual(bd.move("L"),160)
+        self.assertEqual(bd.move(Move.LEFT),160)
 
 class test_board_is_end(unittest.TestCase):
 
@@ -518,44 +518,44 @@ class test_board_is_end(unittest.TestCase):
         bd = Board()
         bd.tiles[0][0] = 1024
         bd.tiles[1][0] = 1024
-        self.assertFalse(bd.is_end())
-        bd.move("U")
-        self.assertEqual(bd.is_end(),1)
+        self.assertEqual(bd.is_end(),BoardStatus.PLAYING)
+        bd.move(Move.UP)
+        self.assertEqual(bd.is_end(),BoardStatus.WIN)
 
     def test_board_is_end_loss(self):
         bd = Board()
         bd.tiles = [[128,256,64,16],[16,2,128,64],[2,4,8,16],[32,64,128,64]]
-        self.assertEqual(bd.is_end(),2)
+        self.assertEqual(bd.is_end(),BoardStatus.GAMEOVER)
 
     def test_board_is_end_win_diff_win_val(self):
         bd = Board(win_val=512)
         bd.tiles = [[512,64,4,2],[128,64,2,0],[64,0,0,0],[0,0,0,0]]
-        self.assertEqual(bd.is_end(),1)
+        self.assertEqual(bd.is_end(),BoardStatus.WIN)
 
     def test_not_end_board_vertical_full(self):
         bd = Board()
         bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(bd.is_end(),0)
+        self.assertEqual(bd.is_end(),BoardStatus.PLAYING)
     
     def test_not_end_board_horizontal_full(self):
         bd = Board()
         bd.tiles = [[2,4,8,128],[8,8,64,1024],[4,16,128,256],[2,8,16,64]]
-        self.assertEqual(bd.is_end(),0)
+        self.assertEqual(bd.is_end(),BoardStatus.PLAYING)
 
     def test_end_board_full(self):
         bd = Board()
         bd.tiles = [[2,4,8,128],[8,32,64,1024],[128,16,128,256],[2,8,16,64]]
-        self.assertEqual(bd.is_end(),2)
+        self.assertEqual(bd.is_end(),BoardStatus.GAMEOVER)
 
     def test_not_end_board_not_full(self):
         bd = Board()
         bd.tiles = [[2,4,8,128],[8,4,64,1024],[4,16,128,256],[0,8,16,64]]
-        self.assertEqual(bd.is_end(),0)
+        self.assertEqual(bd.is_end(),BoardStatus.PLAYING)
 
     def test_end_2048(self):
         bd = Board()
         bd.tiles = [[0,4,8,128],[0,8,64,2048],[0,0,128,256],[0,8,16,64]]
-        self.assertEqual(bd.is_end(),1)
+        self.assertEqual(bd.is_end(),BoardStatus.WIN)
 
 def reset_board(bd):
     bd.tiles = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
