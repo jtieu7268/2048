@@ -1,4 +1,4 @@
-from board import Board, BoardStatus
+from board import Board, BoardStatus, Move
 import pygame
 from enum import Enum
 
@@ -81,7 +81,6 @@ SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
 # TODO
-# clean up gui code
 # enum - clean up in board and text version (board + play_2048 get gamestate enum?)
 # clean up text version
 # consider animations
@@ -251,10 +250,10 @@ class BoardState(PlayState):
                                 pygame.K_s, 
                                 pygame.K_a], 
                             [
-                                "U", 
-                                "R",
-                                "D",
-                                "L"
+                                Move.UP, 
+                                Move.RIGHT,
+                                Move.DOWN,
+                                Move.LEFT
                             ] * 2))
         
         for event in events:

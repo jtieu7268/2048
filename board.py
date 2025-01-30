@@ -8,6 +8,12 @@ class BoardStatus(Enum):
     WIN = 1
     GAMEOVER = 2
 
+class Move(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+
 class Board:
     """a class representing board for playing 2048
 
@@ -25,9 +31,6 @@ class Board:
     WIN_VAL : int
         the value of the tile to form to win
     
-    MOVES : list[str]
-        valid moves: U: UP, R: RIGHT, D: DOWN, L: LEFT
-    
     methods
     -------
     transpose(tiles: list[list[int]]) -> list[list[int]]
@@ -36,19 +39,19 @@ class Board:
     reverse(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles reversed left to right
     
-    process_tiles(dir: str) -> list[list[int]]
+    process_tiles(dir: Move) -> list[list[int]]
         processes board tiles based on direction dir so move related methods can be applied generally independent of direction
     
-    unprocess_tiles(tiles: list, dir: str) -> list[list[int]]
+    unprocess_tiles(tiles: list, dir: Move) -> list[list[int]]
         unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
     
-    is_valid_move(dir: str) -> bool
+    is_valid_move(dir: Move) -> bool
         returns whether moving tiles in direction dir results in a change in the board tiles    
     
     new_tile()
         generates a new tile with a start value at an open location on the board
     
-    move(dir: str) -> int
+    move(dir: Move) -> int
         modifies board tiles according to direction dir, returns score from move
     
     is_end()
@@ -57,7 +60,6 @@ class Board:
 
     DIM = 4
     START_VALS = [2] * 9 + [4] # 90% prob of 2, 10% prob of 1
-    MOVES = ["U","R","D","L"]
 
     def __init__(self, win_val: int = 2048):
         
@@ -101,13 +103,13 @@ class Board:
 
         return [vector[::-1] for vector in tiles]
 
-    def process_tiles(self, dir: str) -> list[list[int]]:
+    def process_tiles(self, dir: Move) -> list[list[int]]:
         """processes board tiles based on direction dir so move-related methods can be applied generally independent of direction
 
         parameters
         ----------
-        dir : str
-            represents direction of move, is one of MOVES
+        dir : Move
+            represents direction of move
 
         returns
         -------
@@ -116,21 +118,21 @@ class Board:
         """
 
         tiles = self.tiles
-        if dir == "U" or dir == "D":
+        if dir == Move.UP or dir == Move.DOWN:
             tiles = Board.transpose(tiles)
-        if dir == "R" or dir == "D":
+        if dir == Move.RIGHT or dir == Move.DOWN:
             tiles = Board.reverse(tiles)
         return tiles
 
-    def unprocess_tiles(self, tiles: list[list[int]], dir: str) -> list[list[int]]:
+    def unprocess_tiles(self, tiles: list[list[int]], dir: Move) -> list[list[int]]:
         """unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
 
         parameters
         ----------
         tiles : list
             the previously processed board tiles
-        dir : str
-            the direction of the move upon which the previous processing was based, is one of MOVES
+        dir : Move
+            the direction of the move upon which the previous processing was based
 
         returns
         -------
@@ -138,19 +140,19 @@ class Board:
             a copy of tiles transposed and/or reversed to undo previous processing based on dir
         """
 
-        if dir == "R" or dir == "D":
+        if dir == Move.RIGHT or dir == Move.DOWN:
             tiles = Board.reverse(tiles)
-        if dir == "U" or dir == "D":
+        if dir == Move.UP or dir == Move.DOWN:
             tiles = Board.transpose(tiles)
         return tiles
 
-    def is_valid_move(self, dir: str) -> bool:
+    def is_valid_move(self, dir: Move) -> bool:
         """checks that move is valid, i.e., moving tiles yields a change to board tiles
 
         parameters
         ----------
-        dir : str
-            direction of the move to be applied to board tiles, is one of MOVES
+        dir : Move
+            direction of the move to be applied to board tiles
 
         returns
         bool
@@ -183,7 +185,7 @@ class Board:
             # generate random value from start values
             self.tiles[r][c] = choice(self.START_VALS)
 
-    def move(self,dir: str) -> int:
+    def move(self,dir: Move) -> int:
         """modifies board tiles according to direction dir
 
         tiles slide in chosen direction based on the following:
@@ -194,12 +196,8 @@ class Board:
 
         parameters
         ----------
-        dir : str
-            the direction to move tiles, dir is in MOVES
-            "U": UP
-            "R": RIGHT
-            "D": DOWN
-            "L": LEFT
+        dir : Move
+            the direction to move tiles
 
         returns
         -------
@@ -270,7 +268,7 @@ class Board:
                 return False
             # board is filled, checks if there are possible merges
             else:
-                for orientation in [self.tiles,self.process_tiles("U")]:
+                for orientation in [self.tiles,self.process_tiles(Move.UP)]:
                     for vector in orientation:
                         prev_val_pos = -1
                         for i,tile in enumerate(vector):
@@ -283,17 +281,13 @@ class Board:
         if no_legal_moves(): return BoardStatus.GAMEOVER
         return BoardStatus.PLAYING
 
-    def play_round(self, dir: str, won: bool) -> tuple[int, BoardStatus]:
+    def play_round(self, dir: Move, won: bool) -> tuple[int, BoardStatus]:
         """executes a round of 2048 including moving bd in direction dir, assuming valid move, generates next tile if possible, returns score from move and state of board
 
         parameters
         ----------
-        dir : str
-            the direction to move tiles, dir is in MOVES
-            "U": UP
-            "R": RIGHT
-            "D": DOWN
-            "L": LEFT
+        dir : Move
+            the direction to move tiles
             
         won : bool
             boolean indicating whether game has been won i.e. if tile with WIN_VAL has been created

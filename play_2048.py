@@ -1,4 +1,4 @@
-from board import Board, BoardStatus
+from board import Board, BoardStatus, Move
 from os import system
 from enum import Enum
 
@@ -15,12 +15,8 @@ class Game:
 
     attributes
     ----------
-    MOVE_KEY : dict[str, str]
+    MOVE_KEY : dict[str, Move]
         keys for game associated with their direction
-        U = UP
-        R = RIGHT
-        D = DOWN
-        L = LEFT
     GAME_KEY : list[str]
         valid keys for playing game
     WIN_VAL_OPTIONS : list[str]
@@ -51,10 +47,10 @@ class Game:
 
     """
 
-    MOVE_KEY = {"W":"U",
-                "D":"R",
-                "S":"D",
-                "A":"L"}
+    MOVE_KEY = {"W":Move.UP,
+                "D":Move.RIGHT,
+                "S":Move.DOWN,
+                "A":Move.LEFT}
     GAME_KEY = ("W","D","S","A","R","Q")
     WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
     BOARD_STATE_KEY = {0: "PLAY",
