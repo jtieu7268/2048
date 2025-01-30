@@ -1,6 +1,12 @@
+from enum import Enum
 from random import choice
 from collections import deque
 import math
+
+class BoardStatus(Enum):
+    PLAYING = 0
+    WIN = 1
+    GAMEOVER = 2
 
 class Board:
     """a class representing board for playing 2048
@@ -19,7 +25,7 @@ class Board:
     WIN_VAL : int
         the value of the tile to form to win
     
-    MOVES : str
+    MOVES : list[str]
         valid moves: U: UP, R: RIGHT, D: DOWN, L: LEFT
     
     methods
@@ -235,11 +241,11 @@ class Board:
         
         return score
 
-    def is_end(self, won: bool=False) -> int:
+    def is_end(self, won: bool=False) -> BoardStatus:
         """returns status of the board tiles
 
-        if board is playable, returns 0 (game is not over) or returns 1 if board tiles contains WIN_VAL
-        if game is over, returns 2 (there are no legal moves)
+        if board is playable, returns BoardStatus.PLAYING or returns BoardStatus.WIN if board tiles contains WIN_VAL
+        if game is over, returns BoardStatus.GAMEOVER (there are no legal moves)
         
         paramaters
         ----------
@@ -248,8 +254,8 @@ class Board:
         
         returns
         -------
-        int
-            the status of the game, 0 if game is not over, 1 if board contains WIN_VAL, 2 if there are no legal moves
+        BoardStatus
+            the status of the game, BoardStatus.PLAYING if game is not over, BoardStatus.WIN if board contains WIN_VAL, BoardStatus.GAMEOVER if there are no legal moves
         """
 
         def is_in_board(val: int):
@@ -261,7 +267,7 @@ class Board:
         def no_legal_moves():
             # checks if board is filled
             if is_in_board(0): 
-                return 0
+                return False
             # board is filled, checks if there are possible merges
             else:
                 for orientation in [self.tiles,self.process_tiles("U")]:
@@ -269,15 +275,15 @@ class Board:
                         prev_val_pos = -1
                         for i,tile in enumerate(vector):
                             if prev_val_pos != -1 and tile == vector[prev_val_pos]:
-                                return 0
+                                return False
                             prev_val_pos = i
-                return 1
+                return True
                             
-        if not won and got_win_val(): return 1
-        if no_legal_moves(): return 2
-        return 0
+        if not won and got_win_val(): return BoardStatus.WIN
+        if no_legal_moves(): return BoardStatus.GAMEOVER
+        return BoardStatus.PLAYING
 
-    def play_round(self, dir: str, won: bool) -> tuple[int, int]:
+    def play_round(self, dir: str, won: bool) -> tuple[int, BoardStatus]:
         """executes a round of 2048 including moving bd in direction dir, assuming valid move, generates next tile if possible, returns score from move and state of board
 
         parameters
@@ -297,8 +303,8 @@ class Board:
         int
             the sum of all the merged tiles resulting from moving tiles in direction dir
 
-        int
-            the status of the game, 0 if game is not over, 1 if board contains WIN_VAL, 2 if there are no legal moves
+        BoardStatus
+            the status of the game, BoardStatus.PLAYING if game is not over, BoardStatus.WIN if board contains WIN_VAL, BoardStatus.GAMEOVER if there are no legal moves
         """
 
         score = self.move(dir)

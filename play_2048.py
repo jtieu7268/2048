@@ -1,8 +1,13 @@
-from board import Board
+from board import Board, BoardStatus
 from os import system
+from enum import Enum
 
 def clear_screen():
     system('clear')
+
+class GameStatus(Enum):
+    PLAY = 0
+    QUIT = 3
 
 class Game:
 
@@ -106,8 +111,8 @@ class Game:
         """
 
         status = self.board.is_end()
-        while self.BOARD_STATE_KEY[status] != "END":
-            if self.BOARD_STATE_KEY[status] == "WIN":
+        while status != BoardStatus.GAMEOVER:
+            if status == BoardStatus.WIN:
                 self.won = True
                 print(f"Congratulations, you got {self.WIN_VAL}!")
                 input("Press any key to continue playing\n")
@@ -141,7 +146,7 @@ class Game:
             status = self.board.is_end(self.won)
             if self.score > self.high_score: self.high_score = self.score
         
-        if self.BOARD_STATE_KEY[status] == "QUIT":
+        if status == GameStatus.QUIT:
             self.end(manual_quit=True)
         else:
             self.end()
