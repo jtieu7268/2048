@@ -69,20 +69,11 @@ class GameStatus(Enum):
     QUIT = 1
     RESTART = 2
 
-GAME_KEY = {"W" : "UP",
-            "D" : "RIGHT",
-            "S" : "DOWN",
-            "A" : "LEFT",
-            "R" : "RESTART",
-            "Q" : "QUIT"}
 WIN_VAL_OPTIONS = (2048, 1024, 512, 256, 128, 64, 32, 16)
 
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
-# TODO
-# enum - clean up in board and text version (board + play_2048 get gamestate enum?)
-# clean up text version
 # consider animations
 # consider efficient board
 # ai

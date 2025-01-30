@@ -21,8 +21,6 @@ class Game:
         valid keys for playing game
     WIN_VAL_OPTIONS : list[str]
         options for game win values
-    BOARD_STATE_KEY : dict[int, str]
-        number states tied to their semantic state
     score : int
         current game score
     high_score : int
@@ -52,11 +50,7 @@ class Game:
                 "S":Move.DOWN,
                 "A":Move.LEFT}
     GAME_KEY = ("W","D","S","A","R","Q")
-    WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128")
-    BOARD_STATE_KEY = {0: "PLAY",
-                       1: "WIN",
-                       2: "END",
-                       3: "QUIT"}
+    WIN_VAL_OPTIONS = ("2048", "1024", "512", "256", "128", "64", "32", "16")
 
     def __init__(self):
         self.score = 0
@@ -79,32 +73,41 @@ class Game:
         clear_screen()
 
     def reset(self):
-        """prompts player to enter win value and initializes board accordingly
-
-        """
+        """prompts player to enter win value and initializes board accordingly"""
         
         if self.score > self.high_score:
             self.high_score = self.score
         self.score = 0
        
         print("What do you want to be the win value?")
-        win_val = input(f"Please enter one of the following or press enter to use default (2048): {self.WIN_VAL_OPTIONS}\n")
-        while win_val != "" and win_val not in self.WIN_VAL_OPTIONS:
-            win_val = input(f"Please enter a valid option or press enter to use default (2048): {self.WIN_VAL_OPTIONS}\n")
+        print("Please enter one of the following or press enter to use default (2048):")
+        for i, win_val in enumerate(self.WIN_VAL_OPTIONS):
+            print(f"[{i+1}] {int(win_val)}")
+        win_val = input()
+        
+        while win_val != "" and not ((win_val in self.WIN_VAL_OPTIONS) or (win_val in [f"{x}" for x in range(1,len(self.WIN_VAL_OPTIONS)+1)])):
+            print("Please enter a valid option or press enter to use default (2048):")
+            for i, win_val in enumerate(self.WIN_VAL_OPTIONS):
+                print(f"[{i+1}] {int(win_val)}")
+            win_val = input()
+        
         if win_val == "": 
-            self.board = Board()
+            # default win value
             self.WIN_VAL = 2048
-        else: 
+        elif win_val in self.WIN_VAL_OPTIONS: 
+            # literal win value was entered
             self.WIN_VAL = int(win_val)
-            self.board = Board(win_val=self.WIN_VAL)
+        else:
+            # numbered option for win value was entered
+            self.WIN_VAL = int(self.WIN_VAL_OPTIONS[int(win_val)-1])
+        
+        self.board = Board(win_val=self.WIN_VAL)
         self.won = False
 
         clear_screen()
 
     def loop(self):
-        """the game loop
-
-        """
+        """the game loop"""
 
         status = self.board.is_end()
         while status != BoardStatus.GAMEOVER:
@@ -127,7 +130,7 @@ class Game:
                     print("Your move did not move any tiles. Please select another direction.")
                 dir = input('Enter a valid move:\n').upper()
             if dir == "Q":
-                status = 3
+                status = GameStatus.QUIT
                 break
             if dir == "R":
                 clear_screen()
@@ -148,9 +151,7 @@ class Game:
             self.end()
 
     def end(self,manual_quit: bool=False):
-        """displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements
-
-        """
+        """displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements"""
 
         clear_screen()
         if not manual_quit: print('GAME OVER')
