@@ -1,3 +1,8 @@
+"""2048 game with graphical user interface.
+
+2048 gui requires pygame
+"""
+
 from board import Board, BoardStatus, Move
 import pygame
 from enum import Enum
@@ -74,11 +79,25 @@ WIN_VAL_OPTIONS = (2048, 1024, 512, 256, 128, 64, 32, 16)
 SCORE_BOX_WIDTH = (HEADER_WIDTH - 3 * LINE_THICKNESS) // 2
 SCORE_BOX_HEIGHT = (HEADER_HEIGHT - LINE_THICKNESS)
 
-# consider animations
-# consider efficient board
-# ai
-
 class StateManager:
+    """the game session manager. launches/ends the game session, controls state/scene transitions, and keeps track of high score.
+    
+    Attributes
+    ----------
+    high_score : int
+        the high score from the whole game session
+
+    running : bool
+        whether the game is running or is set to end, used to control game loop
+
+    state : State
+        the current state of the game
+
+    Methods
+    -------
+    change_state(next_state: State)
+        changes current state to next state and sets manager of next state to self
+    """
     
     def __init__(self):
         self.change_state(IntroState())
@@ -89,30 +108,55 @@ class StateManager:
         self.state = next_state
         self.state.manager = self
 
-    def get_high_score(self):
-        return self.high_score
-
-    def set_high_score(self, high_score):
-        self.high_score = high_score
-
-    def end_game(self):
-        self.running = False
-
 class State:
+    """a state of the game.
+    
+    Methods
+    -------
+    handle_events(events: Eventlist)
+        performs actions based on events
+        
+    update()
+        updates state of game related objects and variables based on events
+        
+    render(window: Surface)
+        displays the game
+    """
 
     def __init__(self):
         pass
     
-    def handle_events(self):
+    def handle_events(self, events):
         raise NotImplementedError
     
     def update(self):
         raise NotImplementedError
     
-    def render(self):
+    def render(self, window):
         raise NotImplementedError
     
 class IntroState(State):
+    """entry point into the game session.
+
+    Atrributes
+    ----------
+    font : Font
+        main font of the state
+    
+    font_sub : Font
+        subtitle font of the state
+    
+    manager : StateManager
+        the manager of the state 
+    
+    Methods
+    -------
+    handle_events(events: Eventlist)
+        waits for player to press key or click before manager changes to ResetState
+    
+    render(window: Surface)
+        displays intro screen
+    """
 
     def __init__(self):
         self.font = pygame.font.SysFont(GAME_FONT, 60, bold=True)
@@ -136,6 +180,36 @@ class IntroState(State):
         pygame.display.update()
 
 class ResetState(State):
+    """scene that prompts player for new win value when starting a new game.
+
+    Attributes
+    ----------
+    font : Font
+        main font of the state
+    
+    font_sub : Font
+        subtitle font of the state
+    
+    manager : StateManager
+        the manager of the state
+    
+    buttons : list[Button]
+        list of buttons representing options for win values
+
+    Methods
+    -------
+    make_buttons()
+        makes buttons for win value options
+    
+    handle_events(events: Eventlist)
+        manager sets win value according to a corresponding button press or mouse click of button and starts game by changing to BoardState
+
+    update()
+        updates state of buttons
+
+    render(window: Surface):
+        displays option buttons, buttons change when hovered over
+    """
 
     OPTION_WIDTH = SCREEN_WIDTH // 3
     OPTION_HEIGHT = OPTION_WIDTH // 4
@@ -156,15 +230,15 @@ class ResetState(State):
             left = self.buttons[(i // DIM) * DIM].get_text_left() if r else None
             self.buttons.append(
                 Button(
-                        rect = (x, y, self.OPTION_WIDTH, self.OPTION_HEIGHT), 
-                        text = f"({i+1}) {win_val}", 
-                        font = self.font_sub, 
-                        font_color = BUTTON_TEXT_COLOR, 
-                        button_color = BUTTON_COLOR, 
-                        button_hover_color = BUTTON_HOVER_COLOR, 
-                        click_action = win_val, 
-                        subsequent_button = left
-                    ))
+                        rect=(x, y, self.OPTION_WIDTH, self.OPTION_HEIGHT), 
+                        text=f"({i+1}) {win_val}", 
+                        font=self.font_sub, 
+                        font_color=BUTTON_TEXT_COLOR, 
+                        button_color=BUTTON_COLOR, 
+                        button_hover_color=BUTTON_HOVER_COLOR, 
+                        click_action=win_val, 
+                        subsequent_button=left
+                ))
 
     def handle_events(self, events):
         KEY_TO_WIN_VAL = dict(zip(
@@ -177,7 +251,9 @@ class ResetState(State):
                 pygame.K_6, 
                 pygame.K_7, 
                 pygame.K_8
-            ), WIN_VAL_OPTIONS))
+            ), 
+            WIN_VAL_OPTIONS)
+        )
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key in KEY_TO_WIN_VAL:
@@ -200,6 +276,13 @@ class ResetState(State):
         pygame.display.update()
 
 class PlayState(State):
+    """a scene for an active game.
+    
+    Methods
+    -------
+    check_quit_reset(keydown: Event)
+        keydown is an Event whose type is KEYDOWN, resets if r key is pressed by changing to ResetState, quits if q key is pressed by changing to EndState
+    """
 
     def __init__(self):
         pass
@@ -220,6 +303,39 @@ class PlayState(State):
             self.manager.change_state(EndState())
 
 class BoardState(PlayState):
+    """the current game.
+    
+    Attributes
+    ----------
+    font_tile : Font
+        the font of the tiles
+        
+    font_score : Font
+        the font of the scores in the header
+        
+    font : font
+        default font for other text in the scene such as in the header and footer
+
+    manager : StateManager
+        the manager of the state
+
+    score : int
+        the score of the current game
+
+    bd : Board
+        the current game board
+
+    won : bool
+        whether the win value has been achieved in the game
+        
+    Methods
+    -------
+    handle_events(events: Eventlist)
+        updates bd, score, won, and high score of session based on moves inputed by player, resets or quits game based on player input, manager changes to WinState or LoseState based on board status
+
+    render(window: Surface)
+        prints bd, score, high score onto window
+    """
 
     def __init__(self, win_val=2048):
         self.font_tile = pygame.font.SysFont(GAME_FONT, 50, bold=True)
@@ -231,21 +347,26 @@ class BoardState(PlayState):
         self.won = False
 
     def handle_events(self, events):
-        KEY_TO_MOVE = dict(zip([
-                                pygame.K_UP, 
-                                pygame.K_RIGHT, 
-                                pygame.K_DOWN, 
-                                pygame.K_LEFT] + [
-                                pygame.K_w, 
-                                pygame.K_d, 
-                                pygame.K_s, 
-                                pygame.K_a], 
-                            [
-                                Move.UP, 
-                                Move.RIGHT,
-                                Move.DOWN,
-                                Move.LEFT
-                            ] * 2))
+        KEY_TO_MOVE = dict(zip(
+            [
+                pygame.K_UP, 
+                pygame.K_RIGHT, 
+                pygame.K_DOWN, 
+                pygame.K_LEFT
+            ] + 
+            [
+                pygame.K_w, 
+                pygame.K_d, 
+                pygame.K_s, 
+                pygame.K_a
+            ], 
+            [
+                Move.UP, 
+                Move.RIGHT,
+                Move.DOWN,
+                Move.LEFT
+            ] * 2)
+        )
         
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -255,7 +376,7 @@ class BoardState(PlayState):
                         self.score += self.bd.move(KEY_TO_MOVE[event.key])
                         self.bd.new_tile()
                         status = self.bd.is_end(self.won)
-                        if self.score > self.manager.get_high_score(): self.manager.set_high_score(self.score)
+                        if self.score > self.manager.high_score: self.manager.high_score = self.score
                         if status == BoardStatus.GAMEOVER:
                             self.manager.change_state(LoseState(self))
                         if status == BoardStatus.WIN:
@@ -298,7 +419,7 @@ class BoardState(PlayState):
             score_header = self.font.render("SCORE", 1, TEXT_FONT_COLOR)
             score_text = self.font_score.render(str(self.score), 1, TEXT_FONT_COLOR)
             high_score_header = self.font.render("HIGH SCORE", 1, TEXT_FONT_COLOR)
-            high_score_text = self.font_score.render(str(self.manager.get_high_score()), 1, TEXT_FONT_COLOR)
+            high_score_text = self.font_score.render(str(self.manager.high_score), 1, TEXT_FONT_COLOR)
             window.blits([
                 (score_header, 
                  (
@@ -347,6 +468,45 @@ class BoardState(PlayState):
         pygame.display.update()
 
 class GameStatusState(PlayState):
+    """scene representing the state of the current game after the player wins or loses and presents player with options on how to proceed.
+    
+    Attributes
+    ----------
+    font_title_message : Font
+        font for the title message
+
+    font : Font
+        default font for the text that isn't the title
+    
+    manager : StateManager
+        the manager of the state
+
+    game_state : BoardState
+        the current game BoardState
+
+    options : list[str]
+        the options of how to proceed from current scene
+
+    buttons : list[Button]
+        buttons associated with options
+
+    start_text_height : float
+        the starting height position of where to print the text based on the options
+
+    Methods
+    -------
+    make_buttons()
+        makes buttons based on options
+
+    handle_events(events: Eventlist)
+        manager changes state to quit, reset, or resume/display board based on player input
+
+    update():
+        updates state of buttons
+
+    render(window: Surface)
+        displays status screen, buttons change when hovered over
+    """
 
     OPTION_WIDTH = SCREEN_WIDTH // 2
     OPTION_HEIGHT = OPTION_WIDTH // 6
@@ -365,14 +525,14 @@ class GameStatusState(PlayState):
         for i, option in enumerate(self.options):
             self.buttons.append(
                 Button(
-                        rect = (SCREEN_WIDTH / 2 - self.OPTION_WIDTH / 2, self.start_text_height + i * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT, self.OPTION_WIDTH, self.OPTION_HEIGHT), 
-                        text = option, 
-                        font = self.font, 
-                        font_color = BUTTON_TEXT_COLOR, 
-                        button_color = BUTTON_COLOR, 
-                        button_hover_color = BUTTON_HOVER_COLOR, 
-                        click_action = self.states[i]
-                        ))
+                        rect=(SCREEN_WIDTH / 2 - self.OPTION_WIDTH / 2, self.start_text_height + i * (self.OPTION_HEIGHT + LINE_THICKNESS) + self.OPTION_HEIGHT, self.OPTION_WIDTH, self.OPTION_HEIGHT), 
+                        text=option, 
+                        font=self.font, 
+                        font_color=BUTTON_TEXT_COLOR, 
+                        button_color=BUTTON_COLOR, 
+                        button_hover_color=BUTTON_HOVER_COLOR, 
+                        click_action=self.states[i]
+                ))
 
     def handle_events(self, events):
         for event in events:
@@ -397,7 +557,7 @@ class GameStatusState(PlayState):
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
         score = self.font.render(f"Score: {self.game_state.score}", 1, TEXT_FONT_COLOR)
-        high_score = self.font.render(f"High Score: {self.manager.get_high_score()}", 1, TEXT_FONT_COLOR)
+        high_score = self.font.render(f"High Score: {self.manager.high_score}", 1, TEXT_FONT_COLOR)
         start_text_height = SCREEN_HEIGHT / 2 - (score.get_height() + high_score.get_height()) / 2
         choose = self.font.render("Select one of the following:", 1, TEXT_FONT_COLOR)
         window.blits([
@@ -422,6 +582,21 @@ class GameStatusState(PlayState):
             button.render(window)
 
 class WinState(GameStatusState):
+    """scene after player acheives win value.
+
+    Attributes
+    ----------
+    win_val : int
+        the win value of the bd of the current game
+
+    options : list[str]
+        additionally concatenates resume game text to first option of options
+    
+    Methods
+    -------
+    render(window: Surface)
+        additionally renders congratulations message and win value
+    """
 
     def __init__(self, game_state):
         super().__init__(game_state)
@@ -449,6 +624,18 @@ class WinState(GameStatusState):
         pygame.display.update()
 
 class LoseState(GameStatusState):
+    """scene after player loses and there are no more legal moves.
+
+    Attributes
+    ----------
+    options : list[str]
+        additionally concatenates view board text to first option of options
+    
+    Methods
+    -------
+    render(window: Surface)
+        additionally renders game over message
+    """
 
     def __init__(self, game_state):
         super().__init__(game_state)
@@ -468,6 +655,27 @@ class LoseState(GameStatusState):
         pygame.display.update()
 
 class EndState(State):
+    """game session ending.
+
+    Attributes
+    ----------
+    font : Font
+        main font of the state
+    
+    font_sub : Font
+        subtitle font of the state
+    
+    manager : StateManager
+        the manager of the state
+
+    Methods
+    -------
+    update()
+        ends game loop by changing manager.running to False
+
+    render(window: Surface)
+        displays end screen with thank you message and high score, pauses 2 seconds before quitting
+    """
 
     def __init__(self):
         self.font = pygame.font.SysFont(GAME_FONT, 55, bold=True)
@@ -477,12 +685,12 @@ class EndState(State):
         pass
 
     def update(self):
-        self.manager.end_game()
+        self.manager.running = False
 
     def render(self, window):
         window.fill(BACKGROUND_COLOR)
         thanks = self.font.render("Thanks for playing!", 1, TEXT_FONT_COLOR)
-        high_score = self.font_sub.render(f"Your high score was {self.manager.get_high_score()}", 1, TEXT_FONT_COLOR)
+        high_score = self.font_sub.render(f"Your high score was {self.manager.high_score}", 1, TEXT_FONT_COLOR)
         window.blits([
             (thanks, 
              (
@@ -499,6 +707,57 @@ class EndState(State):
         pygame.time.wait(2000)
 
 class Button:
+    """clickable button that triggers an event when clicked and that changes when hovered over.
+
+    Attributes
+    ----------
+    rect : Rect
+        rect representing button dimensions and positioning
+
+    font : Font
+        font of button
+
+    font_color : tuple[int, int, int]
+        tuple representing color of font of button as (r, b, g) value
+
+    text : Surface
+        Surface object associated with text of button
+
+    button_color : tuple[int, int, int]
+        tuple representing default color of the button as (r, b, g) value
+
+    curr_color : tuple[int, int, int]
+        tuple representing the current color of the button as (r, b, g) value, same as button_color on initiation
+
+    button_hover_color 
+        tuple representing color of the button if it is hovered over as (r, b, g) value
+
+    click_action : int
+        represents what to return if button is clicked
+
+    clicked : bool
+        whether button has been clicked
+
+    hovered : bool
+        whether mouse is hovered over button
+
+    subsequent_button : int
+        the left position of text of a first button if text of current button needs to be aligned with text of a previous button, otherwise set to 0
+
+    Methods
+    -------
+    check_event(event: Event)
+        checks if event clicks button, if click on button is released, returns click_action
+
+    check_hover()
+        checks if button is hovered over
+
+    update()
+        changes button color based on whether the button is being hovered over
+
+    render(window: Surface)
+        displays the button, if subsequent_button is 0, centers text, if button is a subsequent button, aligns left of text with position given by subsequent_button
+    """
 
     def __init__(self, rect: tuple[int,int,int,int], text: str, font: pygame.font.Font, font_color: tuple[int,int,int], button_color: tuple[int,int,int], button_hover_color: tuple[int,int,int], click_action: int, subsequent_button: int=0):
         self.rect = pygame.Rect(rect)
@@ -532,7 +791,6 @@ class Button:
         if self.hovered:
             self.curr_color = self.button_hover_color
         
-
     def render(self, window):
         pygame.draw.rect(window, self.curr_color, self.rect, border_radius=self.rect.height // 5)
         if not self.subsequent_button:
@@ -560,7 +818,7 @@ def main():
         clock.tick(FPS)
         
         if pygame.event.get(pygame.QUIT):
-            manager.end_game()
+            manager.running = False
             return
 
         manager.state.handle_events(pygame.event.get())

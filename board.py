@@ -15,9 +15,9 @@ class Move(Enum):
     LEFT = 3
 
 class Board:
-    """a class representing board for playing 2048
+    """board for playing 2048.
 
-    attributes
+    Attributes
     ----------
     tiles : list[list[Board]]
         the tiles of the board represented as a 2d array
@@ -31,7 +31,7 @@ class Board:
     WIN_VAL : int
         the value of the tile to form to win
     
-    methods
+    Methods
     -------
     transpose(tiles: list[list[int]]) -> list[list[int]]
         returns a copy of tiles transposed
@@ -55,7 +55,7 @@ class Board:
         modifies board tiles according to direction dir, returns score from move
     
     is_end()
-        returns status of the board tiles, 0 if not the end, 1 if game is won, 2 if no legal moves left and game is over
+        returns status of the board tiles
     """
 
     DIM = 4
@@ -71,47 +71,47 @@ class Board:
         self.new_tile()
     
     def transpose(tiles: list[list[int]]) -> list[list[int]]:
-        """returns a copy of tiles transposed
+        """transposes a copy of tiles and returns.
 
-        parameters
+        Parameters
         ----------
         tiles : list
-            2d array
+            2d array representing current board tiles
 
-        returns
+        Returns
         -------
         list
-            tiles transposed
+            copy of tiles transposed
         """
 
         return list(map(list,zip(*tiles)))
         
     def reverse(tiles: list[list[int]]) -> list[list[int]]:
-        """returns a copy of tiles reversed left to right
+        """reverses a copy of tiles from left to right
 
-        parameters
+        Parameters
         ----------
         tiles : list
-            2d array
+            2d array representing current board tiles
         
-        returns
+        Returns
         -------
         list
-            tiles reversed left to right
+            copy of tiles reversed left to right
 
         """
 
         return [vector[::-1] for vector in tiles]
 
     def process_tiles(self, dir: Move) -> list[list[int]]:
-        """processes board tiles based on direction dir so move-related methods can be applied generally independent of direction
+        """processes board tiles based on direction dir so move-related methods can be applied generally independent of direction.
 
-        parameters
+        Parameters
         ----------
         dir : Move
             represents direction of move
 
-        returns
+        Returns
         -------
         list
             a copy of board tiles transposed and/or reversed based on dir
@@ -125,16 +125,17 @@ class Board:
         return tiles
 
     def unprocess_tiles(self, tiles: list[list[int]], dir: Move) -> list[list[int]]:
-        """unprocesses tiles based on direction dir to restore tiles into original board tiles orientation
+        """unprocesses tiles based on direction dir to restore tiles into original board tiles orientation.
 
-        parameters
+        Parameters
         ----------
         tiles : list
             the previously processed board tiles
+        
         dir : Move
             the direction of the move upon which the previous processing was based
 
-        returns
+        Returns
         -------
         list
             a copy of tiles transposed and/or reversed to undo previous processing based on dir
@@ -147,14 +148,15 @@ class Board:
         return tiles
 
     def is_valid_move(self, dir: Move) -> bool:
-        """checks that move is valid, i.e., moving tiles yields a change to board tiles
+        """checks that move is valid, i.e., moving tiles yields a change to board tiles.
 
-        parameters
+        Parameters
         ----------
         dir : Move
             direction of the move to be applied to board tiles
 
-        returns
+        Returns
+        -------
         bool
             whether a move in direction dir applied to board tiles results in a change in the board tiles
         """
@@ -171,10 +173,9 @@ class Board:
         return False
 
     def new_tile(self):
-        """generates a new tile with a start value at an open location on the board
+        """generates a new tile with a start value at an open location on the board.
 
         directly modifies board tiles
-
         """
         
         # generate random position from open positions on the board
@@ -186,7 +187,7 @@ class Board:
             self.tiles[r][c] = choice(self.START_VALS)
 
     def move(self,dir: Move) -> int:
-        """modifies board tiles according to direction dir
+        """modifies board tiles according to direction dir.
 
         tiles slide in chosen direction based on the following:
 	        1. tiles slide until stopped by edge of board
@@ -194,12 +195,12 @@ class Board:
 	        3. if three tiles with the same value collide, only the two farthest into the chosen direction merge
 	        4. if four tiles with the same value collide, the first two and the last two merge
 
-        parameters
+        Parameters
         ----------
         dir : Move
             the direction to move tiles
 
-        returns
+        Returns
         -------
         int
             the sum of all the merged tiles resulting from moving tiles in direction dir
@@ -240,17 +241,17 @@ class Board:
         return score
 
     def is_end(self, won: bool=False) -> BoardStatus:
-        """returns status of the board tiles
+        """returns status of the board tiles.
 
         if board is playable, returns BoardStatus.PLAYING or returns BoardStatus.WIN if board tiles contains WIN_VAL
         if game is over, returns BoardStatus.GAMEOVER (there are no legal moves)
         
-        paramaters
+        Paramaters
         ----------
         won : bool
             boolean indicating whether game has been won i.e. if tile with WIN_VAL has been created
         
-        returns
+        Returns
         -------
         BoardStatus
             the status of the game, BoardStatus.PLAYING if game is not over, BoardStatus.WIN if board contains WIN_VAL, BoardStatus.GAMEOVER if there are no legal moves
@@ -282,9 +283,9 @@ class Board:
         return BoardStatus.PLAYING
 
     def play_round(self, dir: Move, won: bool) -> tuple[int, BoardStatus]:
-        """executes a round of 2048 including moving bd in direction dir, assuming valid move, generates next tile if possible, returns score from move and state of board
+        """executes a round of 2048 including moving bd in direction dir, assuming valid move, generates next tile if possible, returns score from move and state of board.
 
-        parameters
+        Parameters
         ----------
         dir : Move
             the direction to move tiles
@@ -292,7 +293,7 @@ class Board:
         won : bool
             boolean indicating whether game has been won i.e. if tile with WIN_VAL has been created
 
-        returns
+        Returns
         -------
         int
             the sum of all the merged tiles resulting from moving tiles in direction dir

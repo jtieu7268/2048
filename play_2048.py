@@ -1,3 +1,5 @@
+"""2048 game with text-based interface through terminal."""
+
 from board import Board, BoardStatus, Move
 from os import system
 from enum import Enum
@@ -10,36 +12,45 @@ class GameStatus(Enum):
     QUIT = 3
 
 class Game:
+    """game manager for playing 2048.
 
-    """a class representing board for playing 2048
-
-    attributes
+    Attributes
     ----------
     MOVE_KEY : dict[str, Move]
         keys for game associated with their direction
+    
     GAME_KEY : list[str]
         valid keys for playing game
+    
     WIN_VAL_OPTIONS : list[str]
         options for game win values
+    
     score : int
         current game score
+    
     high_score : int
         high score from all games played during session
+    
     won : bool
         whether the game is won
+    
     board : Board
         the board associated with the game
+    
     WIN_VAL : int
         the win value of the current session
     
-    methods
+    Methods
     -------
     start()
         introduces the game through print statements and sets up the game
+    
     reset()
         starts a new game, asks player for new win value and initializes board accordingly
+    
     loop()
         the game loop for each new game
+    
     end()
         displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements
 
@@ -73,7 +84,7 @@ class Game:
         clear_screen()
 
     def reset(self):
-        """prompts player to enter win value and initializes board accordingly"""
+        """prompts player to enter win value and initializes board accordingly."""
         
         if self.score > self.high_score:
             self.high_score = self.score
@@ -107,7 +118,7 @@ class Game:
         clear_screen()
 
     def loop(self):
-        """the game loop"""
+        """the game loop."""
 
         status = self.board.is_end()
         while status != BoardStatus.GAMEOVER:
@@ -151,7 +162,7 @@ class Game:
             self.end()
 
     def end(self,manual_quit: bool=False):
-        """displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements"""
+        """displays score of the game and asks if player wants to play again, restarts game or bids adieu to player through print statements."""
 
         clear_screen()
         if not manual_quit: print('GAME OVER')
