@@ -704,7 +704,7 @@ class EndState(State):
              )
             )])
         pygame.display.update()
-        pygame.time.wait(2000)
+        pygame.time.wait(10000)
 
 class Button:
     """clickable button that triggers an event when clicked and that changes when hovered over.
