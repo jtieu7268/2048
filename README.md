@@ -42,32 +42,11 @@ Built using Python. The implementation for the graphical interface requires the 
 
 ## Features
 
-* Start the game
+| Feature                           | Text       | GUI        |
+| _________________________________ | __________ | __________ |
+| Start the game                    | ![Starting a text-based game](/images/start_text.png) | ![Starting a GUI game](/images/start_gui.png) |
+| Select a target score             | ![Selecting target score for text-based game](/images/select_text.png) | ![Selecting target score for GUI game](/images/select_gui.png) |
+| Play the game         | ![Play text-based game](/images/play_text.png) | ![Play GUI game](/images/play_gui.png) |
+| Continue playing, quit or restart | ![Resume after winning text-based game](/images/win_text.png) | ![Resume after winning GUI game](/images/win_gui.png) |
+| Quit game                         | ![Quit text-based game](/images/quit_text.png) | ![Quit GUI game](/images/quit_gui.png) |
 
-  ![Starting a text-based game](/images/start_text.png)
-
-  ![Starting a GUI game](/images/start_gui.png)
-
-* Select a target score
-
-  ![Selecting target score for text-based game](/images/select_text.png)
-
-  ![Selecting target score for GUI game](/images/select_gui.png)
-
-* Play the game
-
-  ![Play text-based game](/images/play_text.png)
-
-  ![Play GUI game](/images/play_gui.png)
-
-* Continue playing, quit or restart
-
-  ![Resume after winning text-based game](/images/win_text.png)
-
-  ![Resume after winning GUI game](/images/win_gui.png)
-
-* Quit game
-
-  ![Quit text-based game](/images/quit_text.png)
-
-  ![Quit GUI game](/images/quit_gui.png)
