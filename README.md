@@ -52,7 +52,7 @@ Built using Python. The implementation for the graphical interface requires the 
 
 | Feature | Text | GUI |
 |---|---|---|
-| Start the game |  |  |
+| Start the game | ![Starting a text-based game](/images/start_text.png) | ![Starting a GUI game](/images/start_gui.png) |
 | Select a target score |  |  |
 | Play the game |  |  |
 | Continue playing, quit or restart |  |  |
